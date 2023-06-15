@@ -11,8 +11,8 @@ S3_BUCKET = 'test-stride'
 # FEED_TYPE = 'PRODUCT'
 # FILE_TYPE = 'xml'
 
-SOURCE = 'test.csv'
-FILE_NAME = 'test'
+SOURCE = 'albertron-sale-2.csv'
+FILE_NAME = 'albertron-sale-2'
 FEED_TYPE = 'CSV'
 FILE_TYPE = 'csv'
 
@@ -20,7 +20,7 @@ FILE_TYPE = 'csv'
 producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER)
 
 # byte_ranges = [0, 17715066, 35428650, 53141394, 70856158, 88570444, 106283396, 123996049, 141711336, 159424875]
-byte_ranges = [0, 249777784, 499555588, 749333369, 999111150, 1248888906, 1498666703, 1748444493, 1998222274, 2248000027]
+byte_ranges = [0, 249777783, 499555587, 749333368, 999111149, 1248888905, 1498666702, 1748444492, 1998222273, 2248000027]
 
 for i in range(len(byte_ranges) - 1):
     start = byte_ranges[i]

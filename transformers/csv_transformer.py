@@ -17,8 +17,11 @@ class CsvTransformer(BaseTransformer):
         data_string = self.get_data(s3_bucket, source, chunk_start, chunk_end)
 
         data_file = StringIO(data_string)
-        column_names = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
-        data = pd.read_csv(data_file, names=column_names)
+        if chunk_start != 0:
+            column_names = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
+            data = pd.read_csv(data_file, names=column_names)
+        else:
+            data = pd.read_csv(data_file)
 
         data = self.add_transformations(data)
 

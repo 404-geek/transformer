@@ -23,8 +23,8 @@ def main():
         transformer.transform(
             source=source, 
             file_type=file_type, 
-            start=start, 
-            end=end, 
+            chunk_start=start, 
+            chunk_end=end, 
             s3_bucket=s3_bucket, 
             directory=directory
         )
