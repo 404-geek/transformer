@@ -3,10 +3,17 @@ import pandas as pd
 from io import StringIO
 
 
-
 class CsvTransformer(BaseTransformer):
 
-    def transform(self, source, file_type, chunk_start, chunk_end, s3_bucket, directory):
+    def transform(self, *args, **kwargs):
+
+        source = kwargs['source']
+        file_type = kwargs['file_type']
+        chunk_start = kwargs['chunk_start']
+        chunk_end = kwargs['chunk_end']
+        s3_bucket = kwargs['s3_bucket']
+        directory = kwargs['directory']
+
         data_string = self.get_data(s3_bucket, source, chunk_start, chunk_end)
 
         data_file = StringIO(data_string)

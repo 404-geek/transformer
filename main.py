@@ -1,4 +1,4 @@
-from transformers.transformer_factory import TranformerFactory
+from transformers.transformer_factory import TransformerFactory
 from kafka import KafkaConsumer
 from config.config import KAFKA_SERVER, TRANSFORMER_CHANNEL
 import json
@@ -19,13 +19,16 @@ def main():
         directory = data['directory']
         file_type = data['file_type']
 
-        print("yes")
-
-        transformer = TranformerFactory.get_transformer(feed_type)
-        transformer.transform(source, file_type, start, end, s3_bucket, directory)
-
+        transformer = TransformerFactory.get_transformer(feed_type)
+        transformer.transform(
+            source=source, 
+            file_type=file_type, 
+            start=start, 
+            end=end, 
+            s3_bucket=s3_bucket, 
+            directory=directory
+        )
 
     consumer.close()
-
 
 main()

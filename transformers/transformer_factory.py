@@ -1,12 +1,26 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
+from example.test_transformer import TestTransformer
 
 
-class TranformerFactory:
+class TransformerFactory:
+
+    _transformers = {}
+
+    @staticmethod
+    def register_transformer(key, transformer):
+        TransformerFactory._transformers[key] = transformer
 
     @staticmethod
     def get_transformer(feed_type):
-        if feed_type == "PRODUCT":
-            return ProductTransformer()
-        if feed_type == "CSV":
-            return CsvTransformer()
+        transformer = TransformerFactory._transformers.get(feed_type)
+        if transformer:
+            return transformer()
+        else:
+            raise ValueError(f"Unsupported feed type: {feed_type}")
+
+
+# Registering transformers
+TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
+TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("TEST", TestTransformer)

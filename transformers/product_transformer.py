@@ -1,13 +1,19 @@
-from lxml import etree
-from datetime import datetime
 from utils.base_tranformer import BaseTransformer
-import boto3
-
+from datetime import datetime
+from lxml import etree
 
 
 class ProductTransformer(BaseTransformer):
 
-    def transform(self, source, file_type, chunk_start, chunk_end, s3_bucket, directory):
+    def transform(self, *args, **kwargs):
+
+        source = kwargs['source']
+        file_type = kwargs['file_type']
+        chunk_start = kwargs['chunk_start']
+        chunk_end = kwargs['chunk_end']
+        s3_bucket = kwargs['s3_bucket']
+        directory = kwargs['directory']
+
         data = self.get_data(s3_bucket, source, chunk_start, chunk_end)
 
         chunk_list = self.generate_valid_file(file_type, data.splitlines())

@@ -7,11 +7,11 @@ import os
 class BaseTransformer(ABC):
 
     @abstractmethod
-    def transform():
+    def transform(self, *args, **kwargs):
         ''' Interface method '''
 
 
-    def generate_valid_file(self, file_type: str, lines: List[str]) -> List[str]:
+    def generate_valid_file(self, file_type, lines):
         file_generators = {
             "XML": self.generate_valid_xml,
             "CSV": self.generate_valid_csv
