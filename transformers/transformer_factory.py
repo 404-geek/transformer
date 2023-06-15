@@ -1,6 +1,6 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
-from example.test_transformer import TestTransformer
+from test.test_transformer import TestTransformer
 
 
 class TransformerFactory:
