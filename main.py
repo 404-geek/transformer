@@ -21,11 +21,11 @@ def main():
 
         transformer = TransformerFactory.get_transformer(feed_type)
         transformer.transform(
+            s3_bucket=s3_bucket, 
             source=source, 
             file_type=file_type, 
             chunk_start=start, 
             chunk_end=end, 
-            s3_bucket=s3_bucket, 
             directory=directory
         )
 

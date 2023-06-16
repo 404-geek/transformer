@@ -11,7 +11,7 @@ class BaseTransformer(ABC):
         ''' Interface method '''
 
 
-    def generate_valid_file(self, file_type, lines):
+    def generate_valid_file(self, file_type: str, lines: List[str]) -> List[str]:
         file_generators = {
             "XML": self.generate_valid_xml,
             "CSV": self.generate_valid_csv
@@ -25,7 +25,7 @@ class BaseTransformer(ABC):
         return generate_file(lines)
 
 
-    def make_valid_xml(self, lines):
+    def make_valid_xml(self, lines: List[str]) -> List[str]:
         open_tags = []
         new_lines = []
 
@@ -76,11 +76,11 @@ class BaseTransformer(ABC):
         return new_lines
 
 
-    def make_valid_csv(self, lines):
+    def make_valid_csv(self, lines: List[str]) -> List[str]:
         ''' Make Valid CSV  '''
 
 
-    def generate_batch(self, directory, data, file_type, chunk_start, chunk_end):
+    def generate_batch(self, directory: str, data, file_type: str, chunk_start: int, chunk_end: int) -> None:
         if not os.path.exists(directory):
             os.mkdir(directory)
 
@@ -95,7 +95,7 @@ class BaseTransformer(ABC):
             data.to_csv(batch_name, index=False, header = (chunk_start == 0))
 
 
-    def get_data(self, s3_bucket, source, chunk_start, chunk_end):
+    def get_data(self, s3_bucket: str, source: str, chunk_start: int, chunk_end: int) -> str:
         s3_client = boto3.client('s3')
         response = s3_client.get_object(Bucket=s3_bucket, Key=source, Range=f'bytes={chunk_start}-{chunk_end}')
         data = response['Body'].read().decode('utf-8')

@@ -14,39 +14,33 @@ from utils.base_tranformer import BaseTransformer
 
 class TestTransformer(BaseTransformer):
     
-    def transform(self, *args, **kwargs):
-        ''' Transform the chunk here '''
+    # Transform method which transforms the given chunk by following the given steps
+    def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+        '''
+            Tranform the given chunk by following the given steps
+            
+            - Fetch data from s3 bucket using get_data method which takes 
+              s3_bucket, source, chunk_start, and chunk_end as arguments
+            - Validate the given chunk data if it is not validated
+            - Add specified transformations for the transformer in add_transformations method
+            - Remove extra tags or code that you added to validate the file before generating a batch file
+            - Generate a batch file for the given chunk using generate_batch method which takes
+              directory, data, file_type, chunk_start, and chunk_end as arguments
 
-    def add_transformations(self, *args, **kwargs):
-        ''' Add required transformaton shere '''
+        '''
+
+    # add specified transformations to the given chunk
+    def add_transformations(self, data):
+        ''' Add required transformations here '''
 ```
 <br/>
 
 ### Transform Method
 
-1. Get all the required arguments from the arguments(*args) or  keyword arguments(**kwargs)
+1. Fetch the data from s3 bucket using ```get_data``` method which takes s3_bucket, source, chunk_start and chunk_end as arguments
 
 ```py
-def transform(self, *args, **kwargs):
-
-    ''' get arguments '''
-    source = kwargs['source']
-    file_type = kwargs['file_type']
-    chunk_start = kwargs['chunk_start']
-    chunk_end = kwargs['chunk_end']
-    s3_bucket = kwargs['s3_bucket']
-    directory = kwargs['directory']
-
-    # ...
-
-```
-
-2. Fetch the data from s3 bucket using ```get_data``` method which takes s3_bucket, source, chunk_start and chunk_end as arguments
-
-```py
-def transform(self, *args, **kwargs):
-
-    # ...
+def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
 
     ''' get data from s3 bucket '''
     data = self.get_data(s3_bucket, source, chunk_start, chunk_end)
@@ -55,12 +49,12 @@ def transform(self, *args, **kwargs):
 
 ```
 
-3. Validate the file (for example:- xml file) before making the required transformations to the given chunk. For 'xml' file you can use ```generate_valid_file``` method which is already present in the ```BaseTransformer```
+2. Validate the file (for example:- xml file) before making the required transformations to the given chunk. For 'xml' file you can use ```generate_valid_file``` method which is already present in the ```BaseTransformer```
 
-4. Create a ```add_transformations``` method inside your transformer (example:- ```TestTransformer```) and place all your specified transformation logic in this method. Make sure your chunk is validated before transforming the chunk data.
+3. Create a ```add_transformations``` method inside your transformer (example:- ```TestTransformer```) and place all your specified transformation logic in this method. Make sure your chunk is validated before transforming the chunk data.
 
 ```py
-def transform(self, *args, **kwargs):
+def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
 
     # ...
 
@@ -71,12 +65,12 @@ def transform(self, *args, **kwargs):
 
 ```
 
-5. Remove all the extra tags or data added to validate the chunk data. Make sure you remove everything and make it as the originla chunk before creating a batch file.
+4. Remove all the extra tags or data added to validate the chunk data. Make sure you remove everything and make it as the originla chunk before creating a batch file.
 
-6. Generate a batch file for the given chunk data using ```generate_batch``` method. It takes directory, data, file_type, chunk_start and chunk_end as arguments.
+5. Generate a batch file for the given chunk data using ```generate_batch``` method. It takes directory, data, file_type, chunk_start and chunk_end as arguments.
 
 ```py
-def transform(self, *args, **kwargs):
+def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
 
     # ...
 
@@ -87,7 +81,7 @@ def transform(self, *args, **kwargs):
 
 ```
 
-7. Register your transformer in the ```TransformerFactory``` using ```register_transformer``` method which takes a string and the transformer as arguments.
+6. Register your transformer in the ```TransformerFactory``` using ```register_transformer``` method which takes a string and the transformer as arguments.
 
 ```py
 # transformer_factory.py
@@ -109,20 +103,26 @@ TransformerFactory.register_transformer("TEST", TestTransformer)
 # test_transformer.py
 
 
-from utils.base_tranformer import BaseTransformer
+from utils.base_transformer import BaseTransformer
 
 
 class TestTransformer(BaseTransformer):
     
-    def transform(self, *args, **kwargs):
+    # Transform method which transforms the given chunk by following the given steps
+    def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str):
+        '''
+            Tranform the given chunk by following the given steps
+            
+            - Fetch data from s3 bucket using get_data method which takes 
+              s3_bucket, source, chunk_start, and chunk_end as arguments
+            - Validate the given chunk data if it is not validated
+            - Add specified transformations for the transformer in add_transformations method
+            - Remove extra tags or code that you added to validate the file before generating a batch file
+            - Generate a batch file for the given chunk using generate_batch method which takes
+              directory, data, file_type, chunk_start, and chunk_end as arguments
 
-        ''' get arguments '''
-        source = kwargs['source']
-        file_type = kwargs['file_type']
-        chunk_start = kwargs['chunk_start']
-        chunk_end = kwargs['chunk_end']
-        s3_bucket = kwargs['s3_bucket']
-        directory = kwargs['directory']
+        '''
+        
 
         ''' get data from s3 bucket '''
         data = self.get_data(s3_bucket, source, chunk_start, chunk_end)
@@ -141,8 +141,9 @@ class TestTransformer(BaseTransformer):
         ''' generate batch file for the given chunk after transformations '''
         self.generate_batch(directory, data, file_type, chunk_start, chunk_end)
 
-    
-    def add_transformations(self, *args, **kwargs):
+
+    # add specified transformations to the given chunk
+    def add_transformations(self, data):
         ''' Add required transformations here '''
 
 ```
@@ -156,23 +157,35 @@ Register the transformer in the ```TransformerFactory``` using ```register_trans
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
 from test.test_transformer import TestTransformer
+from utils.base_transformer import BaseTransformer
+from typing import Type
 
+
+TransformerType = Type[BaseTransformer]
 
 class TransformerFactory:
 
     _transformers = {}
 
+    # register a transformer
     @staticmethod
-    def register_transformer(key, transformer):
+    def register_transformer(key:str, transformer: TransformerType) -> None:
+        ''' Registering a transformer using feed type'''
+
         TransformerFactory._transformers[key] = transformer
 
+
+    # get transformer based on feed type
     @staticmethod
-    def get_transformer(feed_type):
+    def get_transformer(feed_type:str) -> BaseTransformer :
+        ''' Get required transformer based on feed type '''
+
         transformer = TransformerFactory._transformers.get(feed_type)
         if transformer:
             return transformer()
         else:
             raise ValueError(f"Unsupported feed type: {feed_type}")
+
 
 
 # Registering transformers
