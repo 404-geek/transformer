@@ -15,7 +15,7 @@ from utils.base_tranformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # Transform method which transforms the given chunk by following the given steps
-    def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -37,24 +37,24 @@ class TestTransformer(BaseTransformer):
 
 ### Transform Method
 
-1. Fetch the data from s3 bucket using ```get_data``` method which takes s3_bucket, source, chunk_start and chunk_end as arguments
+1. Fetch the data from s3 bucket using ```get_data``` method which takes bucket_name, file_name, start, and end as arguments
 
 ```py
-def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
 
     ''' get data from s3 bucket '''
-    data = self.get_data(s3_bucket, source, chunk_start, chunk_end)
+    data = self.get_data(bucket_name, file_name, start, end)
 
     # ...
 
 ```
 
-2. Validate the file (for example:- xml file) before making the required transformations to the given chunk. For 'xml' file you can use ```generate_valid_file``` method which is already present in the ```BaseTransformer```
+2. Validate the file (for example:- xml file) before making the required transformations to the given chunk. For 'xml' file you can use ```generate_valid_xml_file``` method which is already present in the ```BaseTransformer```
 
 3. Create a ```add_transformations``` method inside your transformer (example:- ```TestTransformer```) and place all your specified transformation logic in this method. Make sure your chunk is validated before transforming the chunk data.
 
 ```py
-def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
 
     # ...
 
@@ -67,15 +67,15 @@ def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: in
 
 4. Remove all the extra tags or data added to validate the chunk data. Make sure you remove everything and make it as the originla chunk before creating a batch file.
 
-5. Generate a batch file for the given chunk data using ```generate_batch``` method. It takes directory, data, file_type, chunk_start and chunk_end as arguments.
+5. Generate a batch file for the given chunk data using ```generate_batch``` method. It takes uuid, index, lines, file_type, and start as arguments.
 
 ```py
-def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
 
     # ...
 
     ''' generate batch file for the given chunk after transformations '''
-    self.generate_batch(directory, data, file_type, chunk_start, chunk_end)
+    self.generate_batch(uuid, index, lines, file_type, start)
 
     # ...
 
@@ -103,29 +103,29 @@ TransformerFactory.register_transformer("TEST", TestTransformer)
 # test_transformer.py
 
 
-from utils.base_transformer import BaseTransformer
+from utils.tranformer.base_transformer import BaseTransformer
 
 
 class TestTransformer(BaseTransformer):
     
     # Transform method which transforms the given chunk by following the given steps
-    def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str):
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
             - Fetch data from s3 bucket using get_data method which takes 
-              s3_bucket, source, chunk_start, and chunk_end as arguments
+              bucket_name, file_name, start, and end as arguments
             - Validate the given chunk data if it is not validated
             - Add specified transformations for the transformer in add_transformations method
             - Remove extra tags or code that you added to validate the file before generating a batch file
             - Generate a batch file for the given chunk using generate_batch method which takes
-              directory, data, file_type, chunk_start, and chunk_end as arguments
+              directory, data, file_type, start, and end as arguments
 
         '''
         
 
         ''' get data from s3 bucket '''
-        data = self.get_data(s3_bucket, source, chunk_start, chunk_end)
+        data = self.get_data(bucket_name, file_name, start, end)
 
 
         ''' validate the data chunk if required '''
@@ -139,7 +139,7 @@ class TestTransformer(BaseTransformer):
         
 
         ''' generate batch file for the given chunk after transformations '''
-        self.generate_batch(directory, data, file_type, chunk_start, chunk_end)
+        self.generate_batch(uuid, index, data, file_type, start)
 
 
     # add specified transformations to the given chunk

@@ -43,5 +43,5 @@ pip install -r requirements.txt
 KAFKA_SERVER=
 TRANSFORMER_CHANNEL=
 AGGREGATOR_CHANNEL=
-
+DYNAMODB_KEY=
 ```

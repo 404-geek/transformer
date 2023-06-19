@@ -1,27 +1,27 @@
-from utils.base_transformer import BaseTransformer
+from utils.tranformer.base_transformer import BaseTransformer
 import pandas as pd
 from io import StringIO
 
 
 class CsvTransformer(BaseTransformer):
 
-    def transform(self, s3_bucket: str, source: str, file_type: str, chunk_start: int, chunk_end: int, directory: str) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
             - Fetch data from s3 bucket using get_data method which takes 
-              s3_bucket, source, chunk_start, and chunk_end as arguments
+              bucket_name, file_name, start, and end as arguments
             - Add specified transformations for the transformer in add_transformations method
             - Generate a batch file for the given chunk using generate_batch method which takes
-              directory, data, file_type, chunk_start, and chunk_end as arguments
+              directory, data, file_type, start, and end as arguments
 
         '''
 
         # get data from s3 bucket
-        data_string = self.get_data(s3_bucket, source, chunk_start, chunk_end)
+        data_string = self.get_data(bucket_name, file_name, start, end)
 
         data_file = StringIO(data_string)
-        if chunk_start != 0:
+        if start != 0:
             column_names = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
             data = pd.read_csv(data_file, names=column_names)
         else:
@@ -31,7 +31,7 @@ class CsvTransformer(BaseTransformer):
         data = self.add_transformations(data)
 
         # generate a batch file for given chunk
-        self.generate_batch(directory, data, file_type, chunk_start, chunk_end)
+        self.generate_batch(uuid, index, data, file_type, start)
 
 
     def add_transformations(self, data:pd.DataFrame) -> pd.DataFrame:

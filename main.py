@@ -11,22 +11,26 @@ def main():
 
     for message in consumer:
         data = json.loads(message.value.decode('utf-8'))
+        feed_type = data['feed_type']
+        uuid = data['uuid']
+        event = data['event']
+        bucket_name = data['bucket_name']
+        file_name = data['file_name']
+        file_type = data['file_type']
         start = data['start']
         end = data['end']
-        feed_type = data['feed_type']
-        source = data['source']
-        s3_bucket = data['s3_bucket']
-        directory = data['directory']
-        file_type = data['file_type']
+        index = data['index']
+        last = data['last']
 
         transformer = TransformerFactory.get_transformer(feed_type)
         transformer.transform(
-            s3_bucket=s3_bucket, 
-            source=source, 
+            bucket_name=bucket_name, 
+            file_name=file_name, 
             file_type=file_type, 
-            chunk_start=start, 
-            chunk_end=end, 
-            directory=directory
+            uuid=uuid,
+            index=index,
+            start=start, 
+            end=end, 
         )
 
     consumer.close()

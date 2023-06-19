@@ -1,7 +1,7 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
 from test.test_transformer import TestTransformer
-from utils.base_transformer import BaseTransformer
+from utils.tranformer.base_transformer import BaseTransformer
 from typing import Type
 
 

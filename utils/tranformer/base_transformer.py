@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from utils.db.db import lambda_handler
 from typing import List
 import boto3
 import os
@@ -7,25 +8,11 @@ import os
 class BaseTransformer(ABC):
 
     @abstractmethod
-    def transform(self, *args, **kwargs):
+    def transform(self, **kwargs):
         ''' Interface method '''
 
 
-    def generate_valid_file(self, file_type: str, lines: List[str]) -> List[str]:
-        file_generators = {
-            "XML": self.generate_valid_xml,
-            "CSV": self.generate_valid_csv
-        }
-
-        generate_file = file_generators.get(file_type)
-
-        if generate_file is None:
-            raise ValueError(f"Unsupported file type: {file_type}")
-
-        return generate_file(lines)
-
-
-    def make_valid_xml(self, lines: List[str]) -> List[str]:
+    def generate_valid_xml_file(self, lines: List[str]) -> List[str]:
         open_tags = []
         new_lines = []
 
@@ -76,27 +63,25 @@ class BaseTransformer(ABC):
         return new_lines
 
 
-    def make_valid_csv(self, lines: List[str]) -> List[str]:
-        ''' Make Valid CSV  '''
+    def generate_batch(self, uuid: str, index: int, data, file_type: str, start: int) -> None:
+        if not os.path.exists(uuid):
+            os.mkdir(uuid)
 
+        batch_name = f'{uuid}/{uuid}_{index}.txt'
 
-    def generate_batch(self, directory: str, data, file_type: str, chunk_start: int, chunk_end: int) -> None:
-        if not os.path.exists(directory):
-            os.mkdir(directory)
-
-        batch_name = f'{directory}/batch_{chunk_start}_{chunk_end}.txt'
-
-        if len(data) and chunk_start == 0 and file_type == 'xml':
+        if len(data) and start == 0 and file_type == 'xml':
             data.insert(0, '<?xml version="1.0" encoding="UTF-8"?>')
     
             with open(batch_name, 'w') as f:
                 f.write('\n'.join(data)) 
         else:
-            data.to_csv(batch_name, index=False, header = (chunk_start == 0))
+            data.to_csv(batch_name, index=False, header = (start == 0))
+
+        lambda_handler(batch_name)
 
 
-    def get_data(self, s3_bucket: str, source: str, chunk_start: int, chunk_end: int) -> str:
+    def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
         s3_client = boto3.client('s3')
-        response = s3_client.get_object(Bucket=s3_bucket, Key=source, Range=f'bytes={chunk_start}-{chunk_end}')
+        response = s3_client.get_object(Bucket=bucket_name, Key=file_name, Range=f'bytes={start}-{end}')
         data = response['Body'].read().decode('utf-8')
         return data
