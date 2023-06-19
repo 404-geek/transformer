@@ -15,7 +15,7 @@ from utils.base_tranformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # Transform method which transforms the given chunk by following the given steps
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -40,7 +40,7 @@ class TestTransformer(BaseTransformer):
 1. Fetch the data from s3 bucket using ```get_data``` method which takes bucket_name, file_name, start, and end as arguments
 
 ```py
-def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
 
     ''' get data from s3 bucket '''
     data = self.get_data(bucket_name, file_name, start, end)
@@ -54,7 +54,7 @@ def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str,
 3. Create a ```add_transformations``` method inside your transformer (example:- ```TestTransformer```) and place all your specified transformation logic in this method. Make sure your chunk is validated before transforming the chunk data.
 
 ```py
-def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
 
     # ...
 
@@ -70,12 +70,12 @@ def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str,
 5. Generate a batch file for the given chunk data using ```generate_batch``` method. It takes uuid, index, lines, file_type, and start as arguments.
 
 ```py
-def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
 
     # ...
 
     ''' generate batch file for the given chunk after transformations '''
-    self.generate_batch(uuid, index, lines, file_type, start)
+    self.generate_batch(directory, uuid, index, lines, file_type, start)
 
     # ...
 
@@ -109,7 +109,7 @@ from utils.tranformer.base_transformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # Transform method which transforms the given chunk by following the given steps
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -139,7 +139,7 @@ class TestTransformer(BaseTransformer):
         
 
         ''' generate batch file for the given chunk after transformations '''
-        self.generate_batch(uuid, index, data, file_type, start)
+        self.generate_batch(directory, uuid, index, data, file_type, start)
 
 
     # add specified transformations to the given chunk
