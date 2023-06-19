@@ -21,6 +21,7 @@ def main():
         end = data['end']
         index = data['index']
         last = data['last']
+        directory = data['directory']
 
         transformer = TransformerFactory.get_transformer(feed_type)
         transformer.transform(
@@ -31,6 +32,7 @@ def main():
             index=index,
             start=start, 
             end=end, 
+            directory=directory
         )
 
     consumer.close()

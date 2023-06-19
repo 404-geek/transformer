@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 class ProductTransformer(BaseTransformer):
 
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -50,7 +50,7 @@ class ProductTransformer(BaseTransformer):
                     lines.pop()
 
         # generate a batch file for given chunk
-        self.generate_batch(uuid, index, lines, file_type, start)
+        self.generate_batch(directory, uuid, index, lines, file_type, start)
 
 
     def add_transformations(self, root: ET.Element) -> ET.Element:

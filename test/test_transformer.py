@@ -4,7 +4,7 @@ from utils.transformer.base_transformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # Transform method which transforms the given chunk by following the given steps
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -34,7 +34,7 @@ class TestTransformer(BaseTransformer):
         
 
         ''' generate batch file for the given chunk after transformations '''
-        self.generate_batch(uuid, index, data, file_type, start)
+        self.generate_batch(directory, uuid, index, data, file_type, start)
 
 
     # add specified transformations to the given chunk

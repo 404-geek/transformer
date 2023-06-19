@@ -5,7 +5,7 @@ from io import StringIO
 
 class CsvTransformer(BaseTransformer):
 
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -31,7 +31,7 @@ class CsvTransformer(BaseTransformer):
         data = self.add_transformations(data)
 
         # generate a batch file for given chunk
-        self.generate_batch(uuid, index, data, file_type, start)
+        self.generate_batch(directory, uuid, index, data, file_type, start)
 
 
     def add_transformations(self, data:pd.DataFrame) -> pd.DataFrame:

@@ -4,7 +4,7 @@ import boto3
 
 dynamodb = boto3.client('dynamodb', region_name='us-west-2')
 
-def lambda_handler(batch_name: str):
+def update_db(batch_name: str):
     table_name = 'file-process-tracker'
     
     key = {

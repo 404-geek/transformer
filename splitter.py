@@ -26,6 +26,7 @@ for i in range(len(byte_ranges) - 1):
         "end": end,
         "index": i,
         "last": i == len(byte_ranges) - 1,
+        "directory": "batches"
     }
     range_bytes = json.dumps(range_dict).encode('utf-8')
     producer.send(TRANSFORMER_CHANNEL, range_bytes)

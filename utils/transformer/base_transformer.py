@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from utils.db.db import lambda_handler
+from utils.db.db import update_db
 from typing import List
 import boto3
 import os
@@ -63,11 +63,14 @@ class BaseTransformer(ABC):
         return new_lines
 
 
-    def generate_batch(self, uuid: str, index: int, data, file_type: str, start: int) -> None:
-        if not os.path.exists(uuid):
-            os.mkdir(uuid)
+    def generate_batch(self, directory: str, uuid: str, index: int, data, file_type: str, start: int) -> None:
+        if not os.path.exists(directory):
+            os.mkdir(directory)
 
-        batch_name = f'{uuid}/{uuid}_{index}.txt'
+        if not os.path.exists(f'{directory}/{uuid}'):
+            os.mkdir(f'{directory}/{uuid}')
+
+        batch_name = f'{directory}/{uuid}/{uuid}_{index}.txt'
 
         if len(data) and start == 0 and file_type == 'xml':
             data.insert(0, '<?xml version="1.0" encoding="UTF-8"?>')
@@ -77,7 +80,7 @@ class BaseTransformer(ABC):
         else:
             data.to_csv(batch_name, index=False, header = (start == 0))
 
-        lambda_handler(batch_name)
+        update_db(batch_name)
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
