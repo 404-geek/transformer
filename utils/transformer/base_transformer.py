@@ -72,11 +72,12 @@ class BaseTransformer(ABC):
 
         batch_name = f'{directory}/{uuid}/{uuid}_{index}.txt'
 
-        if len(data) and start == 0 and file_type == 'xml':
-            data.insert(0, '<?xml version="1.0" encoding="UTF-8"?>')
-    
+        if file_type == 'xml':
+            if len(data) and start == 0:
+                data.insert(0, '<?xml version="1.0" encoding="UTF-8"?>')
+        
             with open(batch_name, 'w') as f:
-                f.write('\n'.join(data)) 
+                f.write('\n'.join(data))
         else:
             data.to_csv(batch_name, index=False, header = (start == 0))
 
