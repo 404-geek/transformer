@@ -1,41 +1,14 @@
 from utils.transformer.base_transformer import BaseTransformer
 import pandas as pd
-from io import StringIO
 
 
 class CsvTransformer(BaseTransformer):
 
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
-        '''
-            Tranform the given chunk by following the given steps
-            
-            - Fetch data from s3 bucket using get_data method which takes 
-              bucket_name, file_name, start, and end as arguments
-            - Add specified transformations for the transformer in add_transformations method
-            - Generate a batch file for the given chunk using generate_batch method which takes
-              directory, data, file_type, start, and end as arguments
-
-        '''
-
-        # get data from s3 bucket
-        data_string = self.get_data(bucket_name, file_name, start, end)
-
-        data_file = StringIO(data_string)
-        if start != 0:
-            column_names = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
-            data = pd.read_csv(data_file, names=column_names)
-        else:
-            data = pd.read_csv(data_file)
-
-        # add specified transformations
-        data = self.add_transformations(data)
-
-        # generate a batch file for given chunk
-        self.generate_batch(directory, uuid, index, data, file_type, start)
-
-
-    def add_transformations(self, data:pd.DataFrame) -> pd.DataFrame:
+    def add_transformations(self, data: object) -> object:
         ''' Add required transformations here '''
+
+        if not isinstance(data, pd.DataFrame):
+            return data
 
         start_index=0
         data['Transaction Line'] = data.index + 1 + start_index
