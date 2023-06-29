@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from utils.db.db import update_db
+from utils.utils import check_and_add_xml_header
 import xml.etree.ElementTree as ET
 from typing import List
 import pandas as pd
@@ -68,7 +69,19 @@ class BaseTransformer(ABC):
         return new_lines
 
 
-    def generate_batch(self, directory: str, uuid: str, index: int, data, file_type: str, start: int) -> None:
+    def is_valid_xml(self, lines: List[str]) -> bool:
+        ''' Check if the given XML chunk is valid or not '''
+
+        xml_string = "".join(lines)
+        try:
+            # Try to parse the XML string
+            ET.fromstring(xml_string)
+            return True
+        except ET.ParseError:
+            return False
+
+
+    def generate_batch(self, directory: str, uuid: str, index: int, data, source_file_type: str, destination_file_type: str, start: int) -> None:
         ''' Generate batch file for the given chunk data '''
 
         if not os.path.exists(directory):
@@ -79,16 +92,23 @@ class BaseTransformer(ABC):
 
         batch_name = f'{directory}/{uuid}/{uuid}_{index}.txt'
 
-        if file_type == 'xml':
-            if len(data) and start == 0:
-                data.insert(0, '<?xml version="1.0" encoding="UTF-8"?>')
-        
-            with open(batch_name, 'w') as f:
-                f.write('\n'.join(data))
-        else:
-            data.to_csv(batch_name, index=False, header = (start == 0))
+        batch_saved = False
 
-        update_db(batch_name)
+        if isinstance(data, pd.DataFrame):
+            is_csv = (destination_file_type == 'csv')
+            data = data.to_csv(index=False, header = (start == 0 and is_csv))
+            data = data.splitlines()
+
+        if destination_file_type == 'xml':
+            data = check_and_add_xml_header(data, start)
+        
+        with open(batch_name, 'w') as f:
+            f.write('\n'.join(data))
+        batch_saved = True
+
+
+        if batch_saved:
+            update_db(batch_name)
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
@@ -100,7 +120,7 @@ class BaseTransformer(ABC):
         return data
     
 
-    def transform(self, bucket_name: str, file_name: str, file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs):
+    def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs):
         '''
             Tranform the given chunk by following the given steps
             
@@ -116,13 +136,13 @@ class BaseTransformer(ABC):
         data = self.get_data(bucket_name, file_name, start, end)
 
         # get transformed chunk
-        data = self.get_transformed_chunk(data, file_type, start)
+        data = self.get_transformed_chunk(data, source_file_type, start)
 
         # generate a batch file for given chunk
-        self.generate_batch(directory, uuid, index, data, file_type, start)
+        self.generate_batch(directory, uuid, index, data, source_file_type, destination_file_type, start)
 
 
-    def get_transformed_chunk(self, data, file_type: str, start: int):
+    def get_transformed_chunk(self, data, source_file_type: str, start: int):
         '''
             Generate transformed data for the given chunk
 
@@ -131,21 +151,34 @@ class BaseTransformer(ABC):
             - Remove extra tags added to if file type is xml
         '''
 
-        if(file_type == 'xml'):
+        if(source_file_type == 'xml'):
 
-            # validate the given chunk
-            chunk_list = self.generate_valid_xml_file(data.splitlines())
+            data_lines = data.splitlines()
+            # check if xml chunk is valid or not
+            valid_xml = self.is_valid_xml(data_lines)
 
-            added_lines = len(chunk_list) - len(data.splitlines())
+            if(not valid_xml):
+                # validate the given chunk if it is not valid
+                chunk_list = self.generate_valid_xml_file(data_lines)
+            else:
+                chunk_list = data_lines
+
+            added_lines = len(chunk_list) - len(data_lines)
             chunk_str = '\n'.join(chunk_list)
                 
 
             xml_content_bytes = bytes(chunk_str, encoding='UTF-8')
             root = ET.fromstring(xml_content_bytes)
 
+            # Remove namespaces from XML tags
+            for elem in root.getiterator():
+                if not hasattr(elem.tag, 'find'): continue
+                i = elem.tag.find('}')
+                if i >= 0:
+                    elem.tag = elem.tag[i + 1:]
+
             # add specified transformations
             root = self.add_transformations(data=root)
-
 
             xml_string = ET.tostring(root, encoding='unicode')
             lines = xml_string.splitlines()
@@ -160,17 +193,13 @@ class BaseTransformer(ABC):
                         lines.pop()
             return lines
         
-        else:
+        elif(source_file_type == 'csv'):
 
             data_file = StringIO(data)
-            if start != 0:
-                column_names = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
-                data = pd.read_csv(data_file, names=column_names)
-            else:
-                data = pd.read_csv(data_file)
 
             # add specified transformations
-            data = self.add_transformations(data=data)
-
+            data = self.add_transformations(data=data_file, start=start)
         
             return data
+        
+        return data

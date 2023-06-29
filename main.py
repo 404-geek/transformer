@@ -8,6 +8,7 @@ import json
 def main():
     
     consumer = KafkaConsumer(TRANSFORMER_CHANNEL, bootstrap_servers=KAFKA_SERVER)
+    transformer = None
 
     for message in consumer:
         data = json.loads(message.value.decode('utf-8'))
@@ -16,24 +17,31 @@ def main():
         event = data['event']
         bucket_name = data['bucket_name']
         file_name = data['file_name']
-        file_type = data['file_type']
+        source_file_type = data['source_file_type']
+        destination_file_type = data['destination_file_type']
         start = data['start']
         end = data['end']
         index = data['index']
         last = data['last']
         directory = data['directory']
 
-        transformer = TransformerFactory.get_transformer(feed_type)
+        if not transformer:
+            transformer = TransformerFactory.get_transformer(feed_type)
+        
         transformer.transform(
             bucket_name=bucket_name, 
             file_name=file_name, 
-            file_type=file_type, 
+            source_file_type=source_file_type, 
+            destination_file_type=destination_file_type, 
             uuid=uuid,
             index=index,
             start=start, 
             end=end, 
             directory=directory
         )
+
+        if last:
+            transformer = None
 
     consumer.close()
 

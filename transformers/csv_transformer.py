@@ -4,11 +4,18 @@ import pandas as pd
 
 class CsvTransformer(BaseTransformer):
 
-    def add_transformations(self, data: object) -> object:
+    def __init__(self):
+        self.columns = []
+
+    def add_transformations(self, data: object, **kwargs) -> object:
         ''' Add required transformations here '''
 
-        if not isinstance(data, pd.DataFrame):
-            return data
+        start = kwargs["start"]
+        if(start == 0):
+            data = pd.read_csv(data)
+            self.columns = data.columns
+        else:
+            data = pd.read_csv(data, names=self.columns)
 
         start_index=0
         data['Transaction Line'] = data.index + 1 + start_index
