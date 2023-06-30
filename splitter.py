@@ -19,6 +19,13 @@ feed_type ='CSV'
 # byte_ranges = [0, 17715066, 35428650, 53141394, 70856158, 88570444, 106283396, 123996049, 141711336, 159424875]
 # feed_type = 'PRODUCT'
 
+
+# file_name = 'test_input/test_csv_to_xml.csv'
+# source_file_type = 'csv'
+# destination_file_type = 'xml'
+# feed_type = 'AMG_TO_SFCC_LOCATION'
+# byte_ranges = [0, 1]
+
 for i in range(len(byte_ranges) - 1):
     start = byte_ranges[i]
     if i > 0:

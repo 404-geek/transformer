@@ -12,7 +12,7 @@ import os
 class BaseTransformer(ABC):
 
     @abstractmethod
-    def add_transformations(self, **kwargs):
+    def add_transformations(self, **kwargs) -> str:
         ''' Interface method '''
 
 
@@ -81,7 +81,7 @@ class BaseTransformer(ABC):
             return False
 
 
-    def generate_batch(self, directory: str, uuid: str, index: int, data, source_file_type: str, destination_file_type: str, start: int) -> None:
+    def generate_batch(self, directory: str, uuid: str, index: int, data: str, destination_file_type: str, start: int) -> None:
         ''' Generate batch file for the given chunk data '''
 
         if not os.path.exists(directory):
@@ -92,23 +92,16 @@ class BaseTransformer(ABC):
 
         batch_name = f'{directory}/{uuid}/{uuid}_{index}.txt'
 
-        batch_saved = False
 
-        if isinstance(data, pd.DataFrame):
-            is_csv = (destination_file_type == 'csv')
-            data = data.to_csv(index=False, header = (start == 0 and is_csv))
-            data = data.splitlines()
+        data = data.splitlines()
 
         if destination_file_type == 'xml':
             data = check_and_add_xml_header(data, start)
         
         with open(batch_name, 'w') as f:
             f.write('\n'.join(data))
-        batch_saved = True
 
-
-        if batch_saved:
-            update_db(batch_name)
+        update_db(batch_name)
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
@@ -120,7 +113,7 @@ class BaseTransformer(ABC):
         return data
     
 
-    def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs):
+    def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -139,10 +132,10 @@ class BaseTransformer(ABC):
         data = self.get_transformed_chunk(data, source_file_type, start)
 
         # generate a batch file for given chunk
-        self.generate_batch(directory, uuid, index, data, source_file_type, destination_file_type, start)
+        self.generate_batch(directory, uuid, index, data, destination_file_type, start)
 
 
-    def get_transformed_chunk(self, data, source_file_type: str, start: int):
+    def get_transformed_chunk(self, data: str, source_file_type: str, start: int) -> str:
         '''
             Generate transformed data for the given chunk
 
@@ -178,9 +171,8 @@ class BaseTransformer(ABC):
                     elem.tag = elem.tag[i + 1:]
 
             # add specified transformations
-            root = self.add_transformations(data=root)
+            xml_string = self.add_transformations(data=root)
 
-            xml_string = ET.tostring(root, encoding='unicode')
             lines = xml_string.splitlines()
 
             # remove added tags from the chunk
@@ -191,7 +183,11 @@ class BaseTransformer(ABC):
                 else:
                     for _ in range(added_lines):
                         lines.pop()
-            return lines
+
+            # Convert the list of lines back to a single string
+            data_string = '\n'.join(lines)
+
+            return data_string
         
         elif(source_file_type == 'csv'):
 

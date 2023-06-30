@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 
 class ProductTransformer(BaseTransformer):
 
-    def add_transformations(self, data: object, **kwargs) -> object:
+    def add_transformations(self, data: object, **kwargs) -> str:
         ''' Add required transformations here '''
 
         if not isinstance(data, ET.Element):
@@ -29,4 +29,7 @@ class ProductTransformer(BaseTransformer):
                 order_fulfill.text = 'ordered'
                 product.append(order_fulfill)
 
-        return data
+        # convert and return the data into str format
+        xml_string = ET.tostring(data, encoding='unicode')
+
+        return xml_string

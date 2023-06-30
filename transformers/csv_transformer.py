@@ -7,7 +7,7 @@ class CsvTransformer(BaseTransformer):
     def __init__(self):
         self.columns = []
 
-    def add_transformations(self, data: object, **kwargs) -> object:
+    def add_transformations(self, data: object, **kwargs) -> str:
         ''' Add required transformations here '''
 
         start = kwargs["start"]
@@ -25,4 +25,8 @@ class CsvTransformer(BaseTransformer):
         data['Is Markup'] = 0
         data.rename(columns={"QTY":'Units', 'VAL':'Sold at Price', 'BARCODE':'UPC Number'}, inplace=True)
         data.drop(columns=['STORE', 'DATE'], inplace=True)
+        
+        # convert and return the data into str format
+        data = data.to_csv(index=False, header = (start == 0))
+
         return data

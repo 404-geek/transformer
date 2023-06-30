@@ -15,7 +15,7 @@ from utils.transformer.base_transformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # add specified transformations to the given chunk
-    def add_transformations(self, data: object) -> object:
+    def add_transformations(self, data: object) -> str:
         ''' Add required transformations here '''
 ```
 <br/>
@@ -32,6 +32,7 @@ class TestTransformer(BaseTransformer):
 # Registering transformers
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
 TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
 TransformerFactory.register_transformer("TEST", TestTransformer)
 
 ```
@@ -51,7 +52,7 @@ from utils.transformer.base_transformer import BaseTransformer
 class TestTransformer(BaseTransformer):
     
     # add specified transformations to the given chunk
-    def add_transformations(self, data: object) -> object:
+    def add_transformations(self, data: object) -> str:
         ''' Add required transformations here '''
 
 ```
@@ -64,6 +65,7 @@ Register the transformer in the ```TransformerFactory``` using ```register_trans
 
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
+from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
 from test.test_transformer import TestTransformer
 from utils.transformer.base_transformer import BaseTransformer
 from typing import Type
@@ -99,6 +101,7 @@ class TransformerFactory:
 # Registering transformers
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
 TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
 TransformerFactory.register_transformer("TEST", TestTransformer)
 
 ```
