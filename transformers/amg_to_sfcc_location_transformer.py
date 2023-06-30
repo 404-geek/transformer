@@ -105,36 +105,3 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
         else:
 
             return int(store_id_str).lstrip('0')
-
-            # To update the file_type with respect to uuid
-
-
-        dynamodb = boto3.client('dynamodb')
-
-        table_name = 'file-process-tracker'
-
-        key = {
-
-            'uuid': {'S': uuid}
-
-        }
-
-        expression_attribute_values = {
-
-            ':file_type': {'S': file_type}
-
-        }
-
-        update_expression = 'SET file_type = :file_type'
-
-        dynamodb.update_item(
-
-            TableName=table_name,
-
-            Key=key,
-
-            UpdateExpression=update_expression,
-
-            ExpressionAttributeValues=expression_attribute_values
-
-        )
