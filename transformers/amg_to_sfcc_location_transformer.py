@@ -13,19 +13,22 @@ from io import StringIO
 
 class AMGtoSFCCLocationTransformer(BaseTransformer):
 
-    def __init__(self):
-        self.columns = []
-
     # required transformations for the csv file
 
     def add_transformations(self, data: object, **kwargs) -> str:
 
         start = kwargs["start"]
+
         if(start == 0):
             data = pd.read_csv(data)
-            self.columns = data.columns
         else:
-            data = pd.read_csv(data, names=self.columns)
+            columns = ['Code', 'CompanyName', 'Type', 'Name', 'Address1', 'Address2', 'City',
+                    'State', 'PostalCode', 'Country', 'Latitude', 'Longitude', 'Phone',
+                    'Fax', 'Email', 'URL', 'Active', 'AllowsPickup', 'DropShipper',
+                    'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22',
+                    'MaxOrderThreshold', 'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
+
+            data = pd.read_csv(data, names=columns)
 
         # Create a dictionary to map old column names to new column names
 
