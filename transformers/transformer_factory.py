@@ -1,7 +1,7 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
 from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
-from test.test_transformer import TestTransformer
+from test.sample_transformer import SampleTransformer
 from utils.transformer.base_transformer import BaseTransformer
 from typing import Type
 
@@ -37,4 +37,4 @@ class TransformerFactory:
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
 TransformerFactory.register_transformer("CSV", CsvTransformer)
 TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
-TransformerFactory.register_transformer("TEST", TestTransformer)
+TransformerFactory.register_transformer("SAMPLE", SampleTransformer)

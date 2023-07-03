@@ -9,7 +9,7 @@ class ProductTransformer(BaseTransformer):
     def add_transformations(self, data: object, **kwargs) -> str:
         ''' Add required transformations here '''
 
-        if not isinstance(data, ET.Element):
+        if not data or not isinstance(data, ET.Element):
             return data
         
         products = data.findall('.//product')

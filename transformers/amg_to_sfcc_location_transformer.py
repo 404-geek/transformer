@@ -17,18 +17,25 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
 
     def add_transformations(self, data: object, **kwargs) -> str:
 
-        start = kwargs["start"]
+        if not data:
+            return data
+        
+        try:
 
-        if(start == 0):
-            data = pd.read_csv(data)
-        else:
-            columns = ['Code', 'CompanyName', 'Type', 'Name', 'Address1', 'Address2', 'City',
-                    'State', 'PostalCode', 'Country', 'Latitude', 'Longitude', 'Phone',
-                    'Fax', 'Email', 'URL', 'Active', 'AllowsPickup', 'DropShipper',
-                    'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22',
-                    'MaxOrderThreshold', 'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
+            start = kwargs["start"]
 
-            data = pd.read_csv(data, names=columns)
+            if(start == 0):
+                data = pd.read_csv(data)
+            else:
+                columns = ['Code', 'CompanyName', 'Type', 'Name', 'Address1', 'Address2', 'City',
+                        'State', 'PostalCode', 'Country', 'Latitude', 'Longitude', 'Phone',
+                        'Fax', 'Email', 'URL', 'Active', 'AllowsPickup', 'DropShipper',
+                        'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22',
+                        'MaxOrderThreshold', 'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
+
+                data = pd.read_csv(data, names=columns)
+        except:
+            return data
 
         # Create a dictionary to map old column names to new column names
 
@@ -86,22 +93,26 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
         
     # store-id transformation function
 
-    def transform_store_id(self, store_id):
+    def transform_store_id(self, store_id: object) -> str:
 
-        store_id_str = str(store_id)
+        try:
 
-        # if Store numbers between 1-99 in AMG denotes a “DC”. Therefore pad the “store number” with “DC” and last two digits of the AMG number before exporting to the other systems. e.g. 00001 = DC01
+            store_id_str = str(store_id)
 
-        if store_id_str.isdigit() and 1 <= int(store_id_str) <= 9:
+            # if Store numbers between 1-99 in AMG denotes a “DC”. Therefore pad the “store number” with “DC” and last two digits of the AMG number before exporting to the other systems. e.g. 00001 = DC01
 
-            return "DC" + store_id_str.zfill(2)
+            if store_id_str.isdigit() and 1 <= int(store_id_str) <= 9:
 
-        elif store_id_str.isdigit() and 10 <= int(store_id_str) <= 99:
+                return "DC" + str(int(store_id_str)).zfill(2)
 
-            return "DC" + str(int(store_id_str)).lstrip('0')
+            elif store_id_str.isdigit() and 10 <= int(store_id_str) <= 99:
 
-        # To remove the preceding zeroes when exporting from AMG to the other systems. e.g. 00960 = 960"
+                return "DC" + str(int(store_id_str)).lstrip('0')
 
-        else:
+            # To remove the preceding zeroes when exporting from AMG to the other systems. e.g. 00960 = 960"
 
-            return int(store_id_str).lstrip('0')
+            else:
+
+                return str(int(store_id_str)).lstrip('0')
+        except:
+            return store_id

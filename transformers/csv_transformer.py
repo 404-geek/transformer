@@ -8,13 +8,19 @@ class CsvTransformer(BaseTransformer):
     def add_transformations(self, data: object, **kwargs) -> str:
         ''' Add required transformations here '''
 
-        start = kwargs["start"]
+        if not data:
+            return data
+        
+        try:
+            start = kwargs["start"]
 
-        if(start == 0):
-            data = pd.read_csv(data)
-        else:
-            columns = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
-            data = pd.read_csv(data, names=columns)
+            if(start == 0):
+                data = pd.read_csv(data)
+            else:
+                columns = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
+                data = pd.read_csv(data, names=columns)
+        except:
+            return data
 
         start_index=0
         data['Transaction Line'] = data.index + 1 + start_index
