@@ -1,7 +1,7 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.csv_transformer import CsvTransformer
 from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
-from test.sample_transformer import SampleTransformer
+from transformers.sample_transformer import SampleTransformer
 from utils.transformer.base_transformer import BaseTransformer
 from typing import Type
 

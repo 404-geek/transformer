@@ -143,59 +143,64 @@ class BaseTransformer(ABC):
             - Add specified transformations for the chunk in add_transformations method
             - Remove extra tags added to if file type is xml
         '''
+        try:
+            if(source_file_type == 'xml'):
 
-        if(source_file_type == 'xml'):
+                data_lines = data.splitlines()
+                # check if xml chunk is valid or not
+                valid_xml = self.is_valid_xml(data_lines)
 
-            data_lines = data.splitlines()
-            # check if xml chunk is valid or not
-            valid_xml = self.is_valid_xml(data_lines)
-
-            if(not valid_xml):
-                # validate the given chunk if it is not valid
-                chunk_list = self.generate_valid_xml_file(data_lines)
-            else:
-                chunk_list = data_lines
-
-            added_lines = len(chunk_list) - len(data_lines)
-            chunk_str = '\n'.join(chunk_list)
-                
-
-            xml_content_bytes = bytes(chunk_str, encoding='UTF-8')
-            root = ET.fromstring(xml_content_bytes)
-
-            # Remove namespaces from XML tags
-            for elem in root.getiterator():
-                if not hasattr(elem.tag, 'find'): continue
-                i = elem.tag.find('}')
-                if i >= 0:
-                    elem.tag = elem.tag[i + 1:]
-
-            # add specified transformations
-            xml_string = self.add_transformations(data=root)
-
-            lines = xml_string.splitlines()
-
-            # remove added tags from the chunk
-            if len(lines):
-                if '<root>' in lines[0] and '</root>' in lines[-1]:
-                    lines.pop(0)
-                    lines.pop()
+                if(not valid_xml):
+                    # validate the given chunk if it is not valid
+                    chunk_list = self.generate_valid_xml_file(data_lines)
                 else:
-                    for _ in range(added_lines):
+                    chunk_list = data_lines
+
+                added_lines = len(chunk_list) - len(data_lines)
+                chunk_str = '\n'.join(chunk_list)
+                    
+
+                xml_content_bytes = bytes(chunk_str, encoding='UTF-8')
+                root = ET.fromstring(xml_content_bytes)
+
+                # Remove namespaces from XML tags
+                
+                # for elem in root.getiterator():
+                for elem in root.iter():
+                    if not hasattr(elem.tag, 'find'): continue
+                    i = elem.tag.find('}')
+                    if i >= 0:
+                        elem.tag = elem.tag[i + 1:]
+
+                # add specified transformations
+                xml_string = self.add_transformations(data=root)
+
+                lines = xml_string.splitlines()
+
+                # remove added tags from the chunk
+                if len(lines):
+                    if '<root>' in lines[0] and '</root>' in lines[-1]:
+                        lines.pop(0)
                         lines.pop()
+                    else:
+                        for _ in range(added_lines):
+                            lines.pop()
 
-            # Convert the list of lines back to a single string
-            data_string = '\n'.join(lines)
+                # Convert the list of lines back to a single string
+                data_string = '\n'.join(lines)
 
-            return data_string
-        
-        elif(source_file_type == 'csv'):
+                return data_string
+            
+            elif(source_file_type == 'csv'):
 
-            data_file = StringIO(data)
+                data_file = StringIO(data)
 
-            # add specified transformations
-            data = self.add_transformations(data=data_file, start=start)
-        
+                # add specified transformations
+                data = self.add_transformations(data=data_file, start=start)
+
+                if isinstance(data, StringIO):
+                    data = data.getvalue()
+
+                return data
+        except:
             return data
-        
-        return data

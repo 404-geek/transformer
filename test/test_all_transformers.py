@@ -1,10 +1,13 @@
 import unittest
 from io import StringIO
-from transformers.transformer_factory import TransformerFactory
-from transformers.csv_transformer import CsvTransformer
-from transformers.product_transformer import ProductTransformer
-from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
 import xml.etree.ElementTree as ET
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from transformers.transformer_factory import TransformerFactory
+
 
 
 class TestTransformerFactory(unittest.TestCase):
@@ -22,7 +25,7 @@ class TestTransformerFactory(unittest.TestCase):
 class TestCsvTransformer(unittest.TestCase):
 
     def setUp(self):
-        self.transformer = CsvTransformer()
+        self.transformer = TransformerFactory().get_transformer('CSV')
 
     def test_add_transformations_with_valid_data(self):
         data = StringIO("STORE,QTY,VAL,BARCODE,DATE\n1,2,3,1234,20230303")
@@ -44,7 +47,7 @@ class TestCsvTransformer(unittest.TestCase):
 class TestProductTransformer(unittest.TestCase):
 
     def setUp(self):
-        self.transformer = ProductTransformer()
+        self.transformer = TransformerFactory().get_transformer('PRODUCT')
 
     def test_add_transformations_with_valid_xml(self):
         xml_data = "<products><product><upc>123</upc><step-quantity>1</step-quantity></product></products>"
@@ -61,11 +64,10 @@ class TestProductTransformer(unittest.TestCase):
         self.assertEqual(self.transformer.add_transformations(None), None)
 
 
-
 class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
 
     def setUp(self):
-        self.transformer = AMGtoSFCCLocationTransformer()
+        self.transformer = TransformerFactory().get_transformer('AMG_TO_SFCC_LOCATION')
 
     def test_transform_store_id_with_valid_data(self):
         self.assertEqual(self.transformer.transform_store_id('00001'), 'DC01')
