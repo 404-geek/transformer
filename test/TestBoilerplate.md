@@ -15,7 +15,7 @@ python3 test/test_transformers.py --feed_type=PRODUCT
 python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION
 ```
 
-- To perform unit tests for all all transformer 
+- To perform unit tests for all transformers
 
 ```py
 # for unit testing all transformers
