@@ -125,17 +125,22 @@ class BaseTransformer(ABC):
 
         '''
 
+        try:
+            last = kwargs["last"]
+        except:
+            last = False
+
         # get data from s3 bucket
         data = self.get_data(bucket_name, file_name, start, end)
 
         # get transformed chunk
-        data = self.get_transformed_chunk(data, source_file_type, start)
+        data = self.get_transformed_chunk(data, source_file_type, destination_file_type, start, last)
 
         # generate a batch file for given chunk
         self.generate_batch(directory, uuid, index, data, destination_file_type, start)
 
 
-    def get_transformed_chunk(self, data: str, source_file_type: str, start: int) -> str:
+    def get_transformed_chunk(self, data: str, source_file_type: str, destination_file_type: str, start: int, last: bool) -> str:
         '''
             Generate transformed data for the given chunk
 
@@ -173,23 +178,24 @@ class BaseTransformer(ABC):
                         elem.tag = elem.tag[i + 1:]
 
                 # add specified transformations
-                xml_string = self.add_transformations(data=root)
+                data = self.add_transformations(data=root)
 
-                lines = xml_string.splitlines()
+                if destination_file_type == 'xml':
+                    lines = data.splitlines()
 
-                # remove added tags from the chunk
-                if len(lines):
-                    if '<root>' in lines[0] and '</root>' in lines[-1]:
-                        lines.pop(0)
-                        lines.pop()
-                    else:
-                        for _ in range(added_lines):
+                    # remove added tags from the chunk
+                    if len(lines):
+                        if '<root>' in lines[0] and '</root>' in lines[-1]:
+                            lines.pop(0)
                             lines.pop()
+                        else:
+                            for _ in range(added_lines):
+                                lines.pop()
 
-                # Convert the list of lines back to a single string
-                data_string = '\n'.join(lines)
+                    # Convert the list of lines back to a single string
+                    data = '\n'.join(lines)
 
-                return data_string
+                return data
             
             elif(source_file_type == 'csv'):
 
@@ -201,6 +207,17 @@ class BaseTransformer(ABC):
                 if isinstance(data, StringIO):
                     data = data.getvalue()
 
+                if destination_file_type == 'xml':
+                    if len(data):
+                        data = data.splitlines()
+                        if start != 0:
+                            if '<?xml' in data[0]:
+                                del data[0]
+                            del data[0]
+                        if not last:
+                            del data[-1]
+                        data = '\n'.join(data)
+                
                 return data
         except:
             return data

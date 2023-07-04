@@ -20,22 +20,7 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
         if not data:
             return data
         
-        try:
-
-            start = kwargs["start"]
-
-            if(start == 0):
-                data = pd.read_csv(data)
-            else:
-                columns = ['Code', 'CompanyName', 'Type', 'Name', 'Address1', 'Address2', 'City',
-                        'State', 'PostalCode', 'Country', 'Latitude', 'Longitude', 'Phone',
-                        'Fax', 'Email', 'URL', 'Active', 'AllowsPickup', 'DropShipper',
-                        'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22',
-                        'MaxOrderThreshold', 'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
-
-                data = pd.read_csv(data, names=columns)
-        except:
-            return data
+        data = pd.read_csv(data)
 
         # Create a dictionary to map old column names to new column names
 

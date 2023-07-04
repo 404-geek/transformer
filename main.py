@@ -35,7 +35,8 @@ def main():
             index=index,
             start=start, 
             end=end, 
-            directory=directory
+            directory=directory,
+            last=last
         )
 
     consumer.close()

@@ -24,28 +24,36 @@ class TestTransformers(unittest.TestCase):
         if(FEED_TYPE == 'CSV'):
             data = StringIO("STORE,QTY,VAL,BARCODE,DATE\n1,2,3,1234,20230303")
             data = data.getvalue()
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type='csv', start=0)
-            try:
-                trasformer.generate_batch(data=transformed_data, directory=directory, uuid='test_csv_transformer', index=0, destination_file_type='csv', start=0)
-            except:
-                pass
-            
+            source_file_type = 'csv'
+            destination_file_type = 'csv'
+            start = 0
+            last = False
+            uuid = 'test_csv_transformer'
+            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
+ 
         elif(FEED_TYPE == 'PRODUCT'):
             data = "<products><product><upc>123</upc><step-quantity>1</step-quantity></product></products>"
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type='xml', start=0)
-            try:
-                trasformer.generate_batch(data=transformed_data, directory=directory, uuid='test_product_transformer', index=0, destination_file_type='xml', start=0)
-            except:
-                pass
-        
+            source_file_type = 'xml'
+            destination_file_type = 'xml'
+            start = 0
+            last = False
+            uuid = 'test_product_transformer'
+            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
+
         elif(FEED_TYPE == 'AMG_TO_SFCC_LOCATION'):
-            data = StringIO("Code,CompanyName,Type,Name,Address1,Address2,City,State,PostalCode,Country,Latitude,Longitude,Phone,Fax,Email,URL,Active,AllowsPickup,DropShipper,ShipPriority,GroupId,OpenOrderThreshold,Unnamed: 22,MaxOrderThreshold,Unnamed: 24,ReceiveCustomerBackOrderPOFlag\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1")
+            data = StringIO("Code,CompanyName,Type,Name,Address1,Address2,City,State,PostalCode,Country,Latitude,Longitude,Phone,Fax,Email,URL,Active,AllowsPickup,DropShipper,ShipPriority,GroupId,OpenOrderThreshold,Unnamed: 22,MaxOrderThreshold,Unnamed: 24,ReceiveCustomerBackOrderPOFlag\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1")
             data = data.getvalue()
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type='csv', start=0)
-            try:
-                trasformer.generate_batch(data=transformed_data, directory=directory, uuid='test_amg_to_sfcc_location_transformer', index=0, destination_file_type='xml', start=0)
-            except:
-                pass
+            source_file_type = 'csv'
+            destination_file_type = 'xml'
+            start = 0
+            last = False
+            uuid = 'test_amg_to_sfcc_location_transformer'
+            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
+        
+        try:
+            trasformer.generate_batch(data=transformed_data, directory=directory, uuid=uuid, index=0, destination_file_type=destination_file_type, start=start)
+        except:
+            pass
 
 
 if __name__ == '__main__':
