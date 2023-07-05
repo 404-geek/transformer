@@ -10,7 +10,7 @@
 ### How to run tests
 
 - Run the below command in the terminal to test required transformers
-- It generates the output in the ```output``` folder with name ```{filename}_batch```
+- It generates the output in the ```output``` folder with name ```{filename}_batch.txt```
 - Below are the command line arguments for testing the transformers 
 
 ```

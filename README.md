@@ -159,4 +159,4 @@ TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 
 ## Test Transformers
 
-- To test transformers you can [refer this](https://github.com/404-geek/transformer/blob/main/test/README.md)
+- To test transformers you can [refer this](https://github.com/404-geek/transformer/tree/main/test)
