@@ -1,5 +1,5 @@
 from transformers.product_transformer import ProductTransformer
-from transformers.csv_transformer import CsvTransformer
+from transformers.store_transformer import StoreTransformer
 from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
 from transformers.sample_transformer import SampleTransformer
 from utils.transformer.base_transformer import BaseTransformer
@@ -35,6 +35,6 @@ class TransformerFactory:
 
 # Registering transformers
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
-TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("STORE", StoreTransformer)
 TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
 TransformerFactory.register_transformer("SAMPLE", SampleTransformer)

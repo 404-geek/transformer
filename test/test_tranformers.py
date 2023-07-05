@@ -51,10 +51,10 @@ def test_transformers(feed_type: str, start: int, last: bool, destination_file_t
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--feed_type", help="Set the feed type (str)", default='CSV')
-    parser.add_argument("--start", help="Set start (int)", default=0)
-    parser.add_argument("--last", help="Set last (bool)", default=False)
-    parser.add_argument("--destination_file_type", help="Set destination file type (str)", default=None)
+    parser.add_argument("--feed_type", help="Set the feed type (str)")
+    parser.add_argument("--start", help="Set start (int)")
+    parser.add_argument("--last", help="Set last (bool)")
+    parser.add_argument("--destination_file_type", help="Set destination file type (str)")
 
     
     args, unknown = parser.parse_known_args()

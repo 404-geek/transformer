@@ -2,7 +2,7 @@ from utils.transformer.base_transformer import BaseTransformer
 import pandas as pd
 
 
-class CsvTransformer(BaseTransformer):
+class StoreTransformer(BaseTransformer):
 
 
     def add_transformations(self, data: object, **kwargs) -> str:

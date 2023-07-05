@@ -178,7 +178,7 @@ class BaseTransformer(ABC):
                         elem.tag = elem.tag[i + 1:]
 
                 # add specified transformations
-                data = self.add_transformations(data=root)
+                data = self.add_transformations(data=root, start=start, last=last)
 
                 if destination_file_type == 'xml':
                     lines = data.splitlines()

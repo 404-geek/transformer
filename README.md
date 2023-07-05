@@ -80,7 +80,7 @@ class SampleTransformer(BaseTransformer):
 
 # Registering transformers
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
-TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("STORE", StoreTransformer)
 TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
 TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 
@@ -114,7 +114,7 @@ Register the transformer in the ```TransformerFactory``` using ```register_trans
 
 
 from transformers.product_transformer import ProductTransformer
-from transformers.csv_transformer import CsvTransformer
+from transformers.store_transformer import StoreTransformer
 from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
 from transformers.sample_transformer import SampleTransformer
 from utils.transformer.base_transformer import BaseTransformer
@@ -150,7 +150,7 @@ class TransformerFactory:
 
 # Registering transformers
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
-TransformerFactory.register_transformer("CSV", CsvTransformer)
+TransformerFactory.register_transformer("STORE", StoreTransformer)
 TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
 TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 
@@ -159,4 +159,4 @@ TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 
 ## Test Transformers
 
-- To test transformers you can [refer this](https://github.com/404-geek/transformer/tree/main/test)
+- To test transformers you can [refer this](./test)

@@ -22,26 +22,26 @@ class TestTransformerFactory(unittest.TestCase):
             self.tranformer_factory.get_transformer()
 
 
-class TestCsvTransformer(unittest.TestCase):
+class TestStoreTransformer(unittest.TestCase):
 
     def setUp(self):
-        self.transformer = TransformerFactory().get_transformer('CSV')
+        self.transformer = TransformerFactory().get_transformer('STORE')
 
     def test_add_transformations_with_valid_data(self):
         data = StringIO("STORE,QTY,VAL,BARCODE,DATE\n1,2,3,1234,20230303")
-        transformed_data = self.transformer.add_transformations(data, start=0)
+        transformed_data = self.transformer.add_transformations(data, start=0, last=True)
         expected_output = 'Units,Sold at Price,UPC Number,Transaction Line,Transaction Date,Location Code,Is Price Override,Is Markup\n2,3,1234,1,2023-03-03 00:00:00,00001,0,0\n'
         self.assertEqual(transformed_data, expected_output)
 
     def test_add_transformations_with_start_not_zero(self):
         data = StringIO("1,2,3,1234,20230303")
-        transformed_data = self.transformer.add_transformations(data, start=1)
+        transformed_data = self.transformer.add_transformations(data, start=1, last=True)
         expected_output = '2,3,1234,1,2023-03-03 00:00:00,00001,0,0\n'
         self.assertEqual(transformed_data, expected_output)
 
     def test_add_transformations_with_invalid_data(self):
-        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0), "invalid_csv")
-        self.assertEqual(self.transformer.add_transformations(None, start=0), None)
+        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0, last=True), "invalid_csv")
+        self.assertEqual(self.transformer.add_transformations(None, start=0, last=True), None)
 
 
 class TestProductTransformer(unittest.TestCase):
@@ -52,7 +52,7 @@ class TestProductTransformer(unittest.TestCase):
     def test_add_transformations_with_valid_xml(self):
         xml_data = "<products><product><upc>123</upc><step-quantity>1</step-quantity></product></products>"
         root = ET.fromstring(xml_data)
-        transformed_data = self.transformer.add_transformations(root)
+        transformed_data = self.transformer.add_transformations(root, start=0, last=True)
         root = ET.fromstring(transformed_data)
         self.assertIsNotNone(root.find('.//datetime'))
         self.assertIsNotNone(root.find('.//color'))
@@ -60,8 +60,8 @@ class TestProductTransformer(unittest.TestCase):
         
 
     def test_add_transformations_with_invalid_xml(self):
-        self.assertEqual(self.transformer.add_transformations("invalid_xml"), "invalid_xml")
-        self.assertEqual(self.transformer.add_transformations(None), None)
+        self.assertEqual(self.transformer.add_transformations("invalid_xml", start=0, last=True), "invalid_xml")
+        self.assertEqual(self.transformer.add_transformations(None, start=0, last=True), None)
 
 
 class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
@@ -85,7 +85,7 @@ class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
 
     def test_add_transformations_with_valid_data(self):
         data = StringIO("Code,CompanyName,Type,Name,Address1,Address2,City,State,PostalCode,Country,Latitude,Longitude,Phone,Fax,Email,URL,Active,AllowsPickup,DropShipper,ShipPriority,GroupId,OpenOrderThreshold,Unnamed: 22,MaxOrderThreshold,Unnamed: 24,ReceiveCustomerBackOrderPOFlag\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1")
-        transformed_data = self.transformer.add_transformations(data, start=0)
+        transformed_data = self.transformer.add_transformations(data, start=0, last=True)
         self.assertIn('<store-id>DC01</store-id>', transformed_data)
         self.assertIn('<name>Name1</name>', transformed_data)
         self.assertIn('<address1>Address1</address1>', transformed_data)
@@ -93,8 +93,8 @@ class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
 
 
     def test_add_transformations_with_invalid_data(self):
-        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0), "invalid_csv")
-        self.assertEqual(self.transformer.add_transformations(None, start=0), None)
+        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0, last=True), "invalid_csv")
+        self.assertEqual(self.transformer.add_transformations(None, start=0, last=True), None)
 
 
 if __name__ == '__main__':
