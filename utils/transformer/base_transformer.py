@@ -101,7 +101,7 @@ class BaseTransformer(ABC):
         with open(batch_name, 'w') as f:
             f.write('\n'.join(data))
 
-        update_db(batch_name)
+        update_db(index)
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
@@ -188,9 +188,9 @@ class BaseTransformer(ABC):
                         if '<root>' in lines[0] and '</root>' in lines[-1]:
                             lines.pop(0)
                             lines.pop()
-                        else:
-                            for _ in range(added_lines):
-                                lines.pop()
+
+                        for _ in range(added_lines):
+                            lines.pop()
 
                     # Convert the list of lines back to a single string
                     data = '\n'.join(lines)
@@ -202,21 +202,10 @@ class BaseTransformer(ABC):
                 data_file = StringIO(data)
 
                 # add specified transformations
-                data = self.add_transformations(data=data_file, start=start)
+                data = self.add_transformations(data=data_file, start=start, last=last)
 
                 if isinstance(data, StringIO):
                     data = data.getvalue()
-
-                if destination_file_type == 'xml':
-                    if len(data):
-                        data = data.splitlines()
-                        if start != 0:
-                            if '<?xml' in data[0]:
-                                del data[0]
-                            del data[0]
-                        if not last:
-                            del data[-1]
-                        data = '\n'.join(data)
                 
                 return data
         except:

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product>
+        <upc>123</upc>
+        <step-quantity>1</step-quantity>
+    </product>
+</products>

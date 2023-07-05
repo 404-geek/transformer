@@ -1,5 +1,3 @@
-import unittest
-from io import StringIO
 import xml.etree.ElementTree as ET
 import argparse
 import sys
@@ -10,58 +8,78 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from transformers.transformer_factory import TransformerFactory
 
 
-FEED_TYPE = 'CSV'
+def test_transformers(feed_type: str, start: int, last: bool, destination_file_type: str) -> None:
 
-class TestTransformers(unittest.TestCase):
+    trasformer = TransformerFactory.get_transformer(feed_type)
 
-    def test_transformers(self):
+    directory = 'test'
+    files = []
+    try:
+        for file in os.listdir(f'{directory}/input'):
+            if os.path.isfile(os.path.join(f'{directory}/input', file)):
+                files.append(file)
+    except:
+        return print("Error: No input folder provided inside test folder")
 
-        global FEED_TYPE
+    if len(files) == 0:
+        return print("Error: Please provide a input file inside input folder")
 
-        trasformer = TransformerFactory.get_transformer(FEED_TYPE)
-        directory = 'test/batches'
-
-        if(FEED_TYPE == 'CSV'):
-            data = StringIO("STORE,QTY,VAL,BARCODE,DATE\n1,2,3,1234,20230303")
-            data = data.getvalue()
-            source_file_type = 'csv'
-            destination_file_type = 'csv'
-            start = 0
-            last = False
-            uuid = 'test_csv_transformer'
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
- 
-        elif(FEED_TYPE == 'PRODUCT'):
-            data = "<products><product><upc>123</upc><step-quantity>1</step-quantity></product></products>"
-            source_file_type = 'xml'
-            destination_file_type = 'xml'
-            start = 0
-            last = False
-            uuid = 'test_product_transformer'
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
-
-        elif(FEED_TYPE == 'AMG_TO_SFCC_LOCATION'):
-            data = StringIO("Code,CompanyName,Type,Name,Address1,Address2,City,State,PostalCode,Country,Latitude,Longitude,Phone,Fax,Email,URL,Active,AllowsPickup,DropShipper,ShipPriority,GroupId,OpenOrderThreshold,Unnamed: 22,MaxOrderThreshold,Unnamed: 24,ReceiveCustomerBackOrderPOFlag\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1\n1,Company1,Type1,Name1,Address1,Address2,City,State,12345,US,12.34,-56.78,1234567890,0987654321,email@example.com,http://example.com,1,1,1,1,1,1,1,1,1,1")
-            data = data.getvalue()
-            source_file_type = 'csv'
-            destination_file_type = 'xml'
-            start = 0
-            last = False
-            uuid = 'test_amg_to_sfcc_location_transformer'
-            transformed_data = trasformer.get_transformed_chunk(data, source_file_type=source_file_type, destination_file_type=destination_file_type, start=start, last=last)
-        
+    if len(files) > 1:
+        return print("Error: Please provide only one file inside input folder")
+    
+    with open(f'{directory}/input/{files[0]}', 'r') as data:
+        data = data.read()
         try:
-            trasformer.generate_batch(data=transformed_data, directory=directory, uuid=uuid, index=0, destination_file_type=destination_file_type, start=start)
+            split = os.path.splitext(files[0])
+            file_name = split[0]
+            source_file_type = split[1][1:]
+            if not destination_file_type:
+                destination_file_type =source_file_type
+            # trasformed_data = trasformer.add_transformations(data, start=start, last=last)
+            # print(type(data), source_file_type)
+            trasformed_data = trasformer.get_transformed_chunk(data=data, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type)
+            # print(trasformed_data, type(trasformed_data))
         except:
-            pass
+            return print("Error: Invalid input file")
+
+    if not os.path.exists(f'{directory}/output'):
+        os.mkdir(f'{directory}/output')
+
+    with open(f'{directory}/output/{file_name}_batch.txt', 'w') as file:
+        file.write(trasformed_data)
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--feed_type", help="Set the feed type", default='CSV')
+    parser.add_argument("--feed_type", help="Set the feed type (str)", default='CSV')
+    parser.add_argument("--start", help="Set start (int)", default=0)
+    parser.add_argument("--last", help="Set last (bool)", default=False)
+    parser.add_argument("--destination_file_type", help="Set destination file type (str)", default=None)
+
     
     args, unknown = parser.parse_known_args()
 
-    FEED_TYPE = args.feed_type
+    feed_type = args.feed_type
+    try:
+        start = int(args.start)
+    except:
+        return print("Error: Invalid start type, it should be a number")
 
-    unittest.main(argv=[sys.argv[0]] + unknown)
+    if isinstance(args.last, str):
+        if args.last == 'False':
+            last = False
+        elif args.last == 'True':
+            last = True
+        else:
+            return print("Error: Invalid last type, it should be a True or False")
+    else:
+        last = args.last
+    
+    destination_file_type = args.destination_file_type
+
+
+    test_transformers(feed_type, start, last, destination_file_type)
+
+
+if __name__ == '__main__':
+    main()

@@ -20,7 +20,22 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
         if not data:
             return data
         
-        data = pd.read_csv(data)
+        try:
+            start = kwargs["start"]
+            last = kwargs["last"]
+
+            if(start == 0):
+                data = pd.read_csv(data)
+            else:
+                columns = ['Code', 'CompanyName', 'Type', 'Name', 'Address1', 'Address2',
+                        'City', 'State', 'PostalCode', 'Country', 'Latitude', 'Longitude',
+                        'Phone', 'Fax', 'Email', 'URL', 'Active', 'AllowsPickup',
+                        'DropShipper', 'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22', 'MaxOrderThreshold',
+                        'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
+                data = pd.read_csv(data, names=columns)
+        except:
+            return data
+
 
         # Create a dictionary to map old column names to new column names
 
@@ -71,9 +86,19 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
         data['store-id'] = data['store-id'].apply(self.transform_store_id)
 
         # convert and return the data into str format
-        xml_data_string = data.to_xml()
+        data = data.to_xml()
 
-        return xml_data_string
+        if len(data):
+            data = data.splitlines()
+            if start != 0:
+                if '<?xml' in data[0]:
+                    del data[0]
+                del data[0]
+            if not last:
+                del data[-1]
+            data = '\n'.join(data)
+
+        return data
 
         
     # store-id transformation function

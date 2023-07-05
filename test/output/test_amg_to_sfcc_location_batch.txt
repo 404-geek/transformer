@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<data>
+  <row>
+    <index>0</index>
+    <store-id>DC01</store-id>
+    <name>Name1</name>
+    <address1>Address1</address1>
+    <address2>Address2</address2>
+    <city>City</city>
+    <postal-code>12345</postal-code>
+    <country-code>US</country-code>
+    <latitude>12.34</latitude>
+    <longitude>-56.78</longitude>
+    <phone>1234567890</phone>
+    <email>email@example.com</email>
+  </row>
+  <row>
+    <index>1</index>
+    <store-id>DC01</store-id>
+    <name>Name1</name>
+    <address1>Address1</address1>
+    <address2>Address2</address2>
+    <city>City</city>
+    <postal-code>12345</postal-code>
+    <country-code>US</country-code>
+    <latitude>12.34</latitude>
+    <longitude>-56.78</longitude>
+    <phone>1234567890</phone>
+    <email>email@example.com</email>
+  </row>
+</data>
