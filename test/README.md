@@ -16,8 +16,8 @@
 ```
 required arguments:
   --feed_type                   FEED_TYPE                   Set the feed type (str)        
-  --start                       START                       Set start (int)                
-  --last                        LAST                        Set last (bool)                
+  --start                       START                       Set start of the chunk data (int)                
+  --last                        LAST                        Set if current chunk data is last (bool)                
   --destination_file_type       DESTINATION_FILE_TYPE       Set destination file type (str)
 ```
 
