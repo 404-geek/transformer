@@ -113,7 +113,7 @@ class BaseTransformer(ABC):
         return data
     
 
-    def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, **kwargs) -> None:
+    def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, last: bool, **kwargs) -> None:
         '''
             Tranform the given chunk by following the given steps
             
@@ -125,10 +125,6 @@ class BaseTransformer(ABC):
 
         '''
 
-        try:
-            last = kwargs["last"]
-        except:
-            last = False
 
         # get data from s3 bucket
         data = self.get_data(bucket_name, file_name, start, end)
@@ -140,7 +136,7 @@ class BaseTransformer(ABC):
         self.generate_batch(directory, uuid, index, data, destination_file_type, start)
 
 
-    def get_transformed_chunk(self, data: str, source_file_type: str, destination_file_type: str, start: int, last: bool) -> str:
+    def get_transformed_chunk(self, data: str, source_file_type: str, destination_file_type: str, start: int, last: bool, **kwargs) -> str:
         '''
             Generate transformed data for the given chunk
 

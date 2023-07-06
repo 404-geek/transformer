@@ -19,6 +19,9 @@ required arguments:
   --start                       START                       Set start of the chunk data (int)                
   --last                        LAST                        Set if current chunk data is last (bool)                
   --destination_file_type       DESTINATION_FILE_TYPE       Set destination file type (str)
+
+optional arguments:
+  --end                         END                         Set end of the chunk data (int)
 ```
 
 ```py
@@ -26,10 +29,10 @@ required arguments:
 python3 test/test_transformers.py --feed_type=STORE --start=0 --last=True --destination_file_type=csv 
 
 # for testing product transformer
-python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --last=True --destination_file_type=xml 
+python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --end=1902 --last=False --destination_file_type=xml 
 
 # for testing amg to sfcc location transformer
-python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --last=True --destination_file_type=xml
+python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --end=1502 --last=False --destination_file_type=xml
 ```
 
 - To perform unit tests for all transformers

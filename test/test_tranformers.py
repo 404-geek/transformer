@@ -8,7 +8,20 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from transformers.transformer_factory import TransformerFactory
 
 
-def test_transformers(feed_type: str, start: int, last: bool, destination_file_type: str) -> None:
+def get_test_data(source:str, start: int, end: int) -> str:
+    try:
+        with open(source, 'r') as file:
+            file.seek(start)
+            if end is None:  # If end is not specified, read to the end of the file.
+                data = file.read()
+            else:  # If end is specified, read the specified chunk.
+                data = file.read(end - start)
+        return data
+    except Exception as e:
+        return str(e)
+    
+
+def test_transformers(feed_type: str, start: int, end: int or None, last: bool, destination_file_type: str) -> None:
 
     trasformer = TransformerFactory.get_transformer(feed_type)
 
@@ -27,20 +40,18 @@ def test_transformers(feed_type: str, start: int, last: bool, destination_file_t
     if len(files) > 1:
         return print("Error: Please provide only one file inside input folder")
     
-    with open(f'{directory}/input/{files[0]}', 'r') as data:
-        data = data.read()
-        try:
-            split = os.path.splitext(files[0])
-            file_name = split[0]
-            source_file_type = split[1][1:]
-            if not destination_file_type:
-                destination_file_type =source_file_type
-            # trasformed_data = trasformer.add_transformations(data, start=start, last=last)
-            # print(type(data), source_file_type)
-            trasformed_data = trasformer.get_transformed_chunk(data=data, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type)
-            # print(trasformed_data, type(trasformed_data))
-        except:
-            return print("Error: Invalid input file")
+
+    try:
+        split = os.path.splitext(files[0])
+        file_name = split[0]
+        source_file_type = split[1][1:]
+        if not destination_file_type:
+            destination_file_type =source_file_type
+        source = f'{directory}/input/{files[0]}'
+        data = get_test_data(source, start, end)
+        trasformed_data = trasformer.get_transformed_chunk(data=data, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type)
+    except:
+        return print("Error: Invalid input file")
 
     if not os.path.exists(f'{directory}/output'):
         os.mkdir(f'{directory}/output')
@@ -53,6 +64,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--feed_type", help="Set the feed type (str)")
     parser.add_argument("--start", help="Set start (int)")
+    parser.add_argument("--end", help="Set end (int)", default=None)
     parser.add_argument("--last", help="Set last (bool)")
     parser.add_argument("--destination_file_type", help="Set destination file type (str)")
 
@@ -62,8 +74,12 @@ def main():
     feed_type = args.feed_type
     try:
         start = int(args.start)
+        if args.end != None:
+            end = int(args.end)
+        else:
+            end = args.end
     except:
-        return print("Error: Invalid start type, it should be a number")
+        return print("Error: Invalid start/end type, it should be a number")
 
     if isinstance(args.last, str):
         if args.last == 'False':
@@ -78,7 +94,7 @@ def main():
     destination_file_type = args.destination_file_type
 
 
-    test_transformers(feed_type, start, last, destination_file_type)
+    test_transformers(feed_type, start, end, last, destination_file_type)
 
 
 if __name__ == '__main__':
