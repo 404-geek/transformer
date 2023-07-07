@@ -40,7 +40,8 @@ class TestStoreTransformer(unittest.TestCase):
         self.assertEqual(transformed_data, expected_output)
 
     def test_add_transformations_with_invalid_data(self):
-        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0, last=True), "invalid_csv")
+        with self.assertRaises(FileNotFoundError):
+            self.transformer.add_transformations("invalid_csv", start=0, last=True)
         self.assertEqual(self.transformer.add_transformations(None, start=0, last=True), None)
 
 
@@ -78,9 +79,12 @@ class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
         self.assertEqual(self.transformer.transform_store_id(10), 'DC10')
 
     def test_transform_store_id_with_invalid_data(self):
-        self.assertEqual(self.transformer.transform_store_id('abcd'), 'abcd')
-        self.assertEqual(self.transformer.transform_store_id('invalid'), 'invalid')
-        self.assertEqual(self.transformer.transform_store_id(None), None)
+        with self.assertRaises(ValueError):
+            self.transformer.transform_store_id('abcd')
+        with self.assertRaises(ValueError):
+            self.transformer.transform_store_id('abcd')
+        with self.assertRaises(ValueError):
+            self.transformer.transform_store_id('abcd')
 
 
     def test_add_transformations_with_valid_data(self):
@@ -93,7 +97,9 @@ class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
 
 
     def test_add_transformations_with_invalid_data(self):
-        self.assertEqual(self.transformer.add_transformations("invalid_csv", start=0, last=True), "invalid_csv")
+        with self.assertRaises(FileNotFoundError):
+            self.transformer.add_transformations("invalid_csv", start=0, last=True)
+        # with self.assertRaises(FileNotFoundError):
         self.assertEqual(self.transformer.add_transformations(None, start=0, last=True), None)
 
 

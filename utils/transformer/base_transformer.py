@@ -204,5 +204,6 @@ class BaseTransformer(ABC):
                     data = data.getvalue()
                 
                 return data
-        except:
-            return data
+        except Exception as e:
+            print("Error: %s" % e)
+            raise

@@ -33,8 +33,9 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
                         'DropShipper', 'ShipPriority', 'GroupId', 'OpenOrderThreshold', 'Unnamed: 22', 'MaxOrderThreshold',
                         'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
                 data = pd.read_csv(data, names=columns)
-        except:
-            return data
+        except Exception as e:
+            print("Error: %s" % e)
+            raise
 
 
         # Create a dictionary to map old column names to new column names
@@ -124,5 +125,6 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
             else:
 
                 return str(int(store_id_str)).lstrip('0')
-        except:
-            return store_id
+        except Exception as e:
+            print("Error: %s" % e)
+            raise
