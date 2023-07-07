@@ -101,7 +101,7 @@ class BaseTransformer(ABC):
         with open(batch_name, 'w') as f:
             f.write('\n'.join(data))
 
-        update_db(index)
+        update_db(uuid=uuid, index=index)
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
