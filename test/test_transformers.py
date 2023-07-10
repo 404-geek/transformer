@@ -148,7 +148,7 @@ def main():
         else:
             raise ValueError("Invalid last type, it should be a True or False")
     
-
+    split_points_list = None
     if split_points:
         split_points_list = ast.literal_eval(split_points)
         for split_point in split_points_list:
