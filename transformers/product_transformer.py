@@ -1,6 +1,7 @@
 from utils.transformer.base_transformer import BaseTransformer
 from datetime import datetime
 import xml.etree.ElementTree as ET
+import logging
 
 
 
@@ -10,7 +11,8 @@ class ProductTransformer(BaseTransformer):
         ''' Add required transformations here '''
 
         if not data or not isinstance(data, ET.Element):
-            return data
+            logging.error("Invalid input data")
+            raise ValueError("Invalid input data")
         
         products = data.findall('.//product')
         for product in products:

@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 from typing import List
 import pandas as pd
 from io import StringIO
+import logging
 import boto3
 import os
 
@@ -101,16 +102,24 @@ class BaseTransformer(ABC):
         with open(batch_name, 'w') as f:
             f.write('\n'.join(data))
 
-        update_db(uuid=uuid, index=index)
+        try:
+            update_db(uuid=uuid, index=index)
+        except Exception as e:
+            logging.error(f"Error in updating db: {e}")
+            raise
 
 
     def get_data(self, bucket_name: str, file_name: str, start: int, end: int) -> str:
         ''' Fetch data from s3 bucket '''
 
-        s3_client = boto3.client('s3')
-        response = s3_client.get_object(Bucket=bucket_name, Key=file_name, Range=f'bytes={start}-{end}')
-        data = response['Body'].read().decode('utf-8')
-        return data
+        try:
+            s3_client = boto3.client('s3')
+            response = s3_client.get_object(Bucket=bucket_name, Key=file_name, Range=f'bytes={start}-{end}')
+            data = response['Body'].read().decode('utf-8')
+            return data
+        except Exception as e:
+            logging.error(f"Error in fetching data from S3: {e}")
+            raise
     
 
     def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, last: bool, **kwargs) -> None:
@@ -204,6 +213,11 @@ class BaseTransformer(ABC):
                     data = data.getvalue()
                 
                 return data
+        
+        except ET.ParseError as e:
+            logging.error("Invalid input data")
+            raise ValueError("Invalid input data")
+        
         except Exception as e:
-            print("Error: %s" % e)
+            logging.error(f"Error in transforming chunk: {e}")
             raise

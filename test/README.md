@@ -92,6 +92,7 @@ transformed_store_id = transformer.transform_store_id(store_id)
 ```
 required arguments:
   --feed_type                   FEED_TYPE                   Set the feed type (str)                       
+  --source_file_type            SOURCE_FILE_TYPE            Set source file type (str)
   --destination_file_type       DESTINATION_FILE_TYPE       Set destination file type (str)
 
 optional arguments:
@@ -107,39 +108,39 @@ optional arguments:
 
 ```py
 # test store transformer with start and last
-python3 test/test_transformers.py --feed_type=STORE --start=0 --last=True --destination_file_type=csv 
+python3 test/test_transformers.py --feed_type=STORE --start=0 --last=True --source_file_type=csv --destination_file_type=csv 
 
 # test store transformer with start and end
-python3 test/test_transformers.py --feed_type=STORE --start=0 --end=5013 --destination_file_type=csv 
+python3 test/test_transformers.py --feed_type=STORE --start=0 --end=5013 --source_file_type=csv --destination_file_type=csv 
 
 # test store transformer with split points
-python3 test/test_transformers.py --feed_type=STORE --split_points=2022,5013,8548,13252,15046,20000 --destination_file_type=csv
+python3 test/test_transformers.py --feed_type=STORE --split_points=2022,5013,8548,13252,15046,20000 --source_file_type=csv --destination_file_type=csv
 ```
 
 - Testing ProductTransformer
 
 ```py
 # test product transformer with start and last
-python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --last=True --destination_file_type=xml 
+python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --last=True --source_file_type=xml --destination_file_type=xml 
 
 # test product transformer with start and end
-python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --end=1902 --destination_file_type=xml 
+python3 test/test_transformers.py --feed_type=PRODUCT --start=0 --end=1902 --source_file_type=xml --destination_file_type=xml 
 
 # test product transformer with split points
-python3 test/test_transformers.py --feed_type=PRODUCT --split_points=2790,4550,6017,9000,14000,21037,25142,30543,42009,50000 --destination_file_type=xml
+python3 test/test_transformers.py --feed_type=PRODUCT --split_points=2790,4550,6017,9000,14000,21037,25142,30543,42009,50000 --source_file_type=xml --destination_file_type=xml
 ```
 
 - Testing AMGtoSFCCLocationTransformer
 
 ```py
 # test amg to sfcc location transformer with start and last
-python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --last=True --destination_file_type=xml
+python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --last=True --source_file_type=csv --destination_file_type=xml
 
 # test amg to sfcc location transformer with start and end
-python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --end=1502 --destination_file_type=xml
+python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --start=0 --end=1502 --source_file_type=csv --destination_file_type=xml
 
 # test amg to sfcc location transformer with split points
-python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --split_points=536,1043,1604,2012,2624,3000 --destination_file_type=xml
+python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --split_points=536,1043,1604,2012,2624,3000 --source_file_type=csv --destination_file_type=xml
 ```
 
 ## Unit testing
