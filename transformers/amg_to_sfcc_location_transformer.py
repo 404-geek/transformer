@@ -1,7 +1,14 @@
 
 import pandas as pd
-import logging
+
+import boto3
+
 from utils.transformer.base_transformer import BaseTransformer
+
+from io import StringIO
+
+
+# from utils.db.db import update_file_type
 
 
 class AMGtoSFCCLocationTransformer(BaseTransformer):
@@ -27,7 +34,7 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
                         'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
                 data = pd.read_csv(data, names=columns)
         except Exception as e:
-            logging.error(e)
+            print("Error: %s" % e)
             raise
 
 
@@ -119,5 +126,5 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
 
                 return str(int(store_id_str)).lstrip('0')
         except Exception as e:
-            logging.error(e)
+            print("Error: %s" % e)
             raise

@@ -1,6 +1,5 @@
 from utils.transformer.base_transformer import BaseTransformer
 import pandas as pd
-import logging
 
 
 class StoreTransformer(BaseTransformer):
@@ -21,7 +20,7 @@ class StoreTransformer(BaseTransformer):
                 columns = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
                 data = pd.read_csv(data, names=columns)
         except Exception as e:
-            logging.error(e)
+            print("Error: %s" % e)
             raise
 
         start_index=0
