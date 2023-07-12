@@ -13,7 +13,7 @@ transformer = TransformerFactory.get_transformer("STORE")
 2. **Adding Transformations**: Utilize the **add_transformations** method to perform transformations on the data. Pass in the data (as a **DataFrame**), and any optional parameters like **start**.
 
 ```py
-transformed_data = transformer.add_transformations(data, start=0)
+transformed_data = transformer.add_transformations(data, start=0, **kwargs)
 ```
 
 The transformed data will contain the following columns:
@@ -41,7 +41,7 @@ transformer = TransformerFactory.get_transformer("PRODUCT")
 2. **Adding Transformations**: Utilize the **add_transformations method** to perform transformations on the data. Pass in the XML data (as an **ElementTree** Element), and any optional parameters.
 
 ```py
-transformed_data = transformer.add_transformations(xml_data)
+transformed_data = transformer.add_transformations(xml_data, **kwargs)
 ```
 
 The transformed data will have additional elements appended to each **product** element:
@@ -64,7 +64,7 @@ transformer = TransformerFactory.get_transformer("AMG_TO_SFCC_LOCATION")
 2. **Adding Transformations**: Use the **add_transformations** method to transform the data. Pass in the data (as a **DataFrame**), and any optional arguments like **start** and **last**.
 
 ```py
-transformed_data = transformer.add_transformations(data, start=0, last=True)
+transformed_data = transformer.add_transformations(data, start=0, last=True, **kwargs)
 ```
 
 **Store ID Transformation**: The **transform_store_id** method is used internally to transform store IDs. It's not intended for external use, but can be called separately if needed.
@@ -99,6 +99,11 @@ optional arguments:
   --end                         END                         Set end of the chunk data (int)
   --last                        LAST                        Set if current chunk data is last (bool) 
   --split_points                SPLIT_POINTS                Set split points of the file (int[])
+
+custom arguments:
+  You can also pass custom arguments. It should start with '--' and should have a '=' and then the value. There should not be any spaces between the words ('--file_name' is accepted, '--file name' is not accepted)
+
+  Example: --file_name=test
 ```
 
 ### Example 

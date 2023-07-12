@@ -130,7 +130,7 @@ class BaseTransformer(ABC):
         data = self.get_data(bucket_name, file_name, start, end)
 
         # get transformed chunk
-        data = self.get_transformed_chunk(data, source_file_type, destination_file_type, start, last)
+        data = self.get_transformed_chunk(data, source_file_type, destination_file_type, start, last, **kwargs)
 
         # generate a batch file for given chunk
         self.generate_batch(directory, uuid, index, data, destination_file_type, start)
@@ -174,7 +174,7 @@ class BaseTransformer(ABC):
                         elem.tag = elem.tag[i + 1:]
 
                 # add specified transformations
-                data = self.add_transformations(data=root, start=start, last=last)
+                data = self.add_transformations(data=root, start=start, last=last, **kwargs)
 
                 if destination_file_type == 'xml':
                     lines = data.splitlines()
@@ -193,12 +193,12 @@ class BaseTransformer(ABC):
 
                 return data
             
-            elif(source_file_type == 'csv'):
+            elif(source_file_type == 'csv' or source_file_type == 'go'):
 
                 data_file = StringIO(data)
 
                 # add specified transformations
-                data = self.add_transformations(data=data_file, start=start, last=last)
+                data = self.add_transformations(data=data_file, start=start, last=last, **kwargs)
 
                 if isinstance(data, StringIO):
                     data = data.getvalue()
