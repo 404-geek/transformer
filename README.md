@@ -52,7 +52,8 @@ DYNAMODB_KEY=
 ## Create Transformer
 
 - Create a transformer by inheriting from ```BaseTransformer``` class
-- Specify the transformations logic in ```add_transformations``` method as metioned below
+- Specify the transformations logic in ```add_transformations``` method as mentioned below
+- ```kwargs``` handles any keyword arguments like ```source_file_type```, ```destination_file_type```,  ```start```, ```end```, ```last```, etc
 
 ```py
 # sample_transformer.py

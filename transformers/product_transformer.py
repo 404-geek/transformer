@@ -10,7 +10,7 @@ class ProductTransformer(BaseTransformer):
         ''' Add required transformations here '''
 
         if not data or not isinstance(data, ET.Element):
-            return data
+            raise ValueError("Invalid xml data")
         
         products = data.findall('.//product')
         for product in products:

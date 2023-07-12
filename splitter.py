@@ -9,8 +9,8 @@ producer = KafkaProducer(bootstrap_servers=KAFKA_SERVER)
 file_name = 'albertron-sale-2.csv'
 source_file_type = 'csv'
 destination_file_type = 'csv'
-byte_ranges = [0, 249777783, 499555587, 749333368, 999111149, 1248888905, 1498666702, 1748444492, 1998222273, 2248000027]
-# byte_ranges = [0, 5026, 10056]
+# byte_ranges = [0, 249777783, 499555587, 749333368, 999111149, 1248888905, 1498666702, 1748444492, 1998222273, 2248000027]
+byte_ranges = [0, 5026, 10056]
 feed_type ='STORE'
 
 # file_name = 'DEMANDWAREmasterCatalog_P8_20221102160230.xml'

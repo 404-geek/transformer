@@ -115,7 +115,7 @@ class BaseTransformer(ABC):
 
     def transform(self, bucket_name: str, file_name: str, source_file_type: str, destination_file_type: str, uuid: str, index: int, start: int, end: int, directory: str, last: bool, **kwargs) -> None:
         '''
-            Tranform the given chunk by following the given steps
+            Transform the given chunk by following the given steps
             
             - Fetch data from s3 bucket using get_data method which takes 
               bucket_name, file_name, start, and end as arguments
@@ -130,7 +130,7 @@ class BaseTransformer(ABC):
         data = self.get_data(bucket_name, file_name, start, end)
 
         # get transformed chunk
-        data = self.get_transformed_chunk(data, source_file_type, destination_file_type, start, last, **kwargs)
+        data = self.get_transformed_chunk(data, source_file_type, destination_file_type, start, last, bucket_name=bucket_name, file_name=file_name, uuid=uuid, index=index, end=end, directory=directory, **kwargs)
 
         # generate a batch file for given chunk
         self.generate_batch(directory, uuid, index, data, destination_file_type, start)
@@ -174,7 +174,7 @@ class BaseTransformer(ABC):
                         elem.tag = elem.tag[i + 1:]
 
                 # add specified transformations
-                data = self.add_transformations(data=root, start=start, last=last, **kwargs)
+                data = self.add_transformations(data=root, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type, **kwargs)
 
                 if destination_file_type == 'xml':
                     lines = data.splitlines()
@@ -198,12 +198,15 @@ class BaseTransformer(ABC):
                 data_file = StringIO(data)
 
                 # add specified transformations
-                data = self.add_transformations(data=data_file, start=start, last=last, **kwargs)
+                data = self.add_transformations(data=data_file, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type, **kwargs)
 
                 if isinstance(data, StringIO):
                     data = data.getvalue()
                 
                 return data
+        
+        except ET.ParseError as e:
+            raise ValueError("Invalid xml file")
+
         except Exception as e:
-            print("Error: %s" % e)
-            raise
+            raise(e)

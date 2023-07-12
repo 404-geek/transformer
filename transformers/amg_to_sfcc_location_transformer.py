@@ -34,8 +34,7 @@ class AMGtoSFCCLocationTransformer(BaseTransformer):
                         'Unnamed: 24', 'ReceiveCustomerBackOrderPOFlag']
                 data = pd.read_csv(data, names=columns)
         except Exception as e:
-            print("Error: %s" % e)
-            raise
+            raise(e)
 
 
         # Create a dictionary to map old column names to new column names

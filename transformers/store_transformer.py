@@ -20,8 +20,7 @@ class StoreTransformer(BaseTransformer):
                 columns = ['STORE', 'QTY', 'VAL', 'BARCODE', 'DATE']
                 data = pd.read_csv(data, names=columns)
         except Exception as e:
-            print("Error: %s" % e)
-            raise
+            raise(e)
 
         start_index=0
         data['Transaction Line'] = data.index + 1 + start_index

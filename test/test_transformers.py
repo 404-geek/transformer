@@ -1,6 +1,4 @@
-import xml.etree.ElementTree as ET
 from typing import List
-import argparse
 import logging
 import ast
 import sys

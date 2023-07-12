@@ -1,8 +1,26 @@
 # Test Transformers
 
 
-## Store Transformer
-### Usage
+## Test Transformer Boilerplate
+
+1. **Initialization**: Create an instance of the required transformer from **TransformerFactory** by passing ```feed_type```.
+
+```py
+transformer = TransformerFactory.get_transformer(feed_type)
+```
+
+2. **Adding Transformations**: **add_transformations** method is used to add the required transformations. 
+- It takes ```data``` as input. 
+- You can also pass other arguments such as ```source_file_type```, ```destination_file_type```, ```start```, ```end```, ```last```, etc.
+
+```py
+transformed_data = transformer.add_transformations(data, **kwargs)
+```
+
+## Implementation of each transformer
+
+### Store Transformer
+#### Usage
 
 1. **Initialization**: Create an instance of the **StoreTransformer** from **TransformerFactory**.
 
@@ -11,6 +29,7 @@ transformer = TransformerFactory.get_transformer("STORE")
 ```
 
 2. **Adding Transformations**: Utilize the **add_transformations** method to perform transformations on the data. Pass in the data (as a **DataFrame**), and any optional parameters like **start**.
+- Other arguments passed to the main method are transferred to this method with ```kwargs```
 
 ```py
 transformed_data = transformer.add_transformations(data, start=0, **kwargs)
@@ -29,8 +48,8 @@ The transformed data will contain the following columns:
 
 <br/>
 
-## Product Transformer
-### Usage
+### Product Transformer
+#### Usage
 
 1. **Initialization**: Create an instance of the **ProductTransformer** from **TransformerFactory**.
 
@@ -39,6 +58,8 @@ transformer = TransformerFactory.get_transformer("PRODUCT")
 ```
 
 2. **Adding Transformations**: Utilize the **add_transformations method** to perform transformations on the data. Pass in the XML data (as an **ElementTree** Element), and any optional parameters.
+- Other arguments passed to the main method are transferred to this method with ```kwargs```
+
 
 ```py
 transformed_data = transformer.add_transformations(xml_data, **kwargs)
@@ -52,8 +73,8 @@ The transformed data will have additional elements appended to each **product** 
 
 <br/>
 
-## AMG to SFCC Location Transformer
-### Usage
+### AMG to SFCC Location Transformer
+#### Usage
 
 1. **Initialization**: Create an instance of the **AMGtoSFCCLocationTransformer** from **TransformerFactory**.
 
@@ -62,6 +83,7 @@ transformer = TransformerFactory.get_transformer("AMG_TO_SFCC_LOCATION")
 ```
 
 2. **Adding Transformations**: Use the **add_transformations** method to transform the data. Pass in the data (as a **DataFrame**), and any optional arguments like **start** and **last**.
+- Other arguments passed to the main method are transferred to this method with ```kwargs```
 
 ```py
 transformed_data = transformer.add_transformations(data, start=0, last=True, **kwargs)
@@ -101,9 +123,9 @@ optional arguments:
   --split_points                SPLIT_POINTS                Set split points of the file (int[])
 
 custom arguments:
-  You can also pass custom arguments. It should start with '--' and should have a '=' and then the value. There should not be any spaces between the words ('--file_name' is accepted, '--file name' is not accepted)
+  You can also pass custom arguments. It should start with '--' and should have a '=' and then the value. There should not be any spaces between the words ('--event_name' is accepted, '--event name' is not accepted)
 
-  Example: --file_name=test
+  Example: --event_name=test
 ```
 
 ### Example 
