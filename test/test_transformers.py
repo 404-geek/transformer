@@ -147,11 +147,11 @@ def validate_args(args) -> dict:
         args['split_points'] = list(args['split_points'])
 
     try:
-        if not args.get('start'):
+        if args.get('start'):
             args['start'] = int(args.get('start'))
         else:
             args['start'] = None
-        if not args.get('end'):
+        if args.get('end'):
             args['end'] = int(args.get('end'))
         else:
             args['end'] = None
@@ -174,12 +174,12 @@ def main():
             else:
                 kwargs[arg[2:]] = True
 
-    try:
-        validated_args = validate_args(kwargs)
-    except Exception as e:
-        logging.error(e)
-        sys.exit(1)
-    # validated_args = validate_args(kwargs)
+    # try:
+    #     validated_args = validate_args(kwargs)
+    # except Exception as e:
+    #     logging.error(e)
+    #     sys.exit(1)
+    validated_args = validate_args(kwargs)
 
     test_transformers(**validated_args)
 
