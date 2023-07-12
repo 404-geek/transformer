@@ -9,90 +9,12 @@
 transformer = TransformerFactory.get_transformer(feed_type)
 ```
 
-2. **Adding Transformations**: **add_transformations** method is used to add the required transformations. 
-- It takes ```data``` as input. 
-- You can also pass other arguments such as ```source_file_type```, ```destination_file_type```, ```start```, ```end```, ```last```, etc.
+2. **Get Transformed Chunk**: **get_transformed_chunk** method is used to get the transformed chunk after adding the required transformations. 
+- It takes ```data```, ```source_file_type```, ```destination_file_type```, ```start```, ```last``` as input. 
+- You can also pass other arguments such as ```file_name```, ```uuid```, ```index```, ```end```, etc that are handled by ```kwargs```.
 
 ```py
-transformed_data = transformer.add_transformations(data, **kwargs)
-```
-
-## Implementation of each transformer
-
-### Store Transformer
-#### Usage
-
-1. **Initialization**: Create an instance of the **StoreTransformer** from **TransformerFactory**.
-
-```py
-transformer = TransformerFactory.get_transformer("STORE")
-```
-
-2. **Adding Transformations**: Utilize the **add_transformations** method to perform transformations on the data. Pass in the data (as a **DataFrame**), and any optional parameters like **start**.
-- Other arguments passed to the main method are transferred to this method with ```kwargs```
-
-```py
-transformed_data = transformer.add_transformations(data, start=0, **kwargs)
-```
-
-The transformed data will contain the following columns:
-
-- Transaction Line
-- Transaction Date
-- Location Code
-- Is Price Override
-- Is Markup
-- Units
-- Sold at Price
-- UPC Number
-
-<br/>
-
-### Product Transformer
-#### Usage
-
-1. **Initialization**: Create an instance of the **ProductTransformer** from **TransformerFactory**.
-
-```py
-transformer = TransformerFactory.get_transformer("PRODUCT")
-```
-
-2. **Adding Transformations**: Utilize the **add_transformations method** to perform transformations on the data. Pass in the XML data (as an **ElementTree** Element), and any optional parameters.
-- Other arguments passed to the main method are transferred to this method with ```kwargs```
-
-
-```py
-transformed_data = transformer.add_transformations(xml_data, **kwargs)
-```
-
-The transformed data will have additional elements appended to each **product** element:
-
-- **datetime**: The current timestamp.
-- **color**: Set to 'brown' if the product has a UPC, otherwise set to 'black'.
-- **order-fulfill**: If **step-quantity** is '1', this element is appended with value 'ordered'.
-
-<br/>
-
-### AMG to SFCC Location Transformer
-#### Usage
-
-1. **Initialization**: Create an instance of the **AMGtoSFCCLocationTransformer** from **TransformerFactory**.
-
-```py
-transformer = TransformerFactory.get_transformer("AMG_TO_SFCC_LOCATION")
-```
-
-2. **Adding Transformations**: Use the **add_transformations** method to transform the data. Pass in the data (as a **DataFrame**), and any optional arguments like **start** and **last**.
-- Other arguments passed to the main method are transferred to this method with ```kwargs```
-
-```py
-transformed_data = transformer.add_transformations(data, start=0, last=True, **kwargs)
-```
-
-**Store ID Transformation**: The **transform_store_id** method is used internally to transform store IDs. It's not intended for external use, but can be called separately if needed.
-
-```py
-transformed_store_id = transformer.transform_store_id(store_id)
+transformed_data = transformer.get_transformed_chunk(data=data, start=start, last=last, source_file_type=source_file_type, destination_file_type=destination_file_type, **kwargs)
 ```
 
 <br/>
