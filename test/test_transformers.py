@@ -147,15 +147,20 @@ def validate_args(args) -> dict:
         args['split_points'] = list(args['split_points'])
 
     try:
-        if args.get('start') is not None:
+        if not args.get('start'):
             args['start'] = int(args.get('start'))
-        if args.get('end') is not None:
+        else:
+            args['start'] = None
+        if not args.get('end'):
             args['end'] = int(args.get('end'))
+        else:
+            args['end'] = None
     except ValueError:
         raise ValueError("Invalid start/end type, it should be a number")
 
 
     return args
+
 
 def main():
     args = sys.argv[1:]
