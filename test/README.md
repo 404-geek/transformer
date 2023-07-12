@@ -35,7 +35,8 @@ transformed_data = transformer.get_transformed_chunk(data=data, start=start, las
 
 ```
 required arguments:
-  --feed_type                   FEED_TYPE                   Set the feed type (str)                       
+  --feed_type                   FEED_TYPE                   Set the feed type (str)  
+  --source_file_type            SOURCE_FILE_TYPE            Set source file type (str)
   --destination_file_type       DESTINATION_FILE_TYPE       Set destination file type (str)
 
 optional arguments:
