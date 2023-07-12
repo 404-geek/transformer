@@ -111,40 +111,34 @@ def test_transformers(feed_type: str, split_points: List[int] or None, start: in
 
 def validate_args(args) -> dict:
 
-    if not args['feed_type']:
+    if not args.get('feed_type'):
         raise ValueError("feed_type is required")
 
-    if not args['source_file_type']:
+    if not args.get('source_file_type'):
         raise ValueError("source_file_type is required")
 
-    if not args['destination_file_type']:
+    if not args.get('destination_file_type'):
         raise ValueError("destination_file_type is required")
-
-    if not args['split_points']:
-        if args['start'] and (not args['last']):
-            raise ValueError("end or last=True is required")
-
-        if (not args['start']) and (not args['end']):
-            raise ValueError("Either (start and end) or split_points are required")
-
-    try:
-        if args['start'] is not None:
-            args['start'] = int(args['start'])
-        if args['end'] is not None:
-            args['end'] = int(args['end'])
-    except ValueError:
-        raise ValueError("Invalid start/end type, it should be a number")
-
-    if isinstance(args['last'], str):
-        if args['last'].lower() == 'false':
+    
+    if isinstance(args.get('last'), str):
+        if args.get('last').lower() == 'false':
             args['last'] = False
-        elif args['last'].lower() == 'true':
+        elif args.get('last').lower() == 'true':
             args['last'] = True
         else:
             raise ValueError("Invalid last type, it should be True or False")
+    else:
+        args['last'] = False
 
-    if args['split_points']:
-        args['split_points'] = ast.literal_eval(args['split_points'])
+    if not args.get('split_points'):
+        args['split_points'] = None
+        if args.get('start') and (not args.get('last')):
+            raise ValueError("end or last=True is required")
+
+        if (not args.get('start')) and (not args.get('end')):
+            raise ValueError("Either (start and end) or split_points are required")
+    else:
+        args['split_points'] = ast.literal_eval(args.get('split_points'))
         for split_point in args['split_points']:
             try:
                 split_point = int(split_point)
@@ -152,8 +146,16 @@ def validate_args(args) -> dict:
                 raise ValueError(f"Invalid split point: {split_point}")
         args['split_points'] = list(args['split_points'])
 
-    return args
+    try:
+        if args.get('start') is not None:
+            args['start'] = int(args.get('start'))
+        if args.get('end') is not None:
+            args['end'] = int(args.get('end'))
+    except ValueError:
+        raise ValueError("Invalid start/end type, it should be a number")
 
+
+    return args
 
 def main():
     args = sys.argv[1:]
@@ -172,6 +174,8 @@ def main():
     except Exception as e:
         logging.error(e)
         sys.exit(1)
+    # validated_args = validate_args(kwargs)
+
     test_transformers(**validated_args)
 
 
