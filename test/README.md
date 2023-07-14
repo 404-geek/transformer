@@ -93,6 +93,104 @@ python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --split_point
 
 ## Unit testing
 
+### Overview
+
+A set of assert methods provided by unittest.TestCase allows you to check for conditions such as:
+
+- ```assertEqual(a, b)```: Check a and b are equal
+- ```assertIsNone(x)```: Check that x is None
+- ```assertIsNotNone(x)```: Check that x is not None
+- ```assertRaises(exception, callable, *args, **kwargs)```: Check that an exception is raised when calling a function.
+
+### Test Sections
+
+#### **TestTransformerFactory**
+
+- This section tests the ```TransformerFactory``` class to ensure it correctly returns the right kind of transformer based on the input argument. 
+- It also checks for the exception handling, in case of invalid arguments or absence of arguments.
+
+```py
+class TestTransformerFactory(unittest.TestCase):
+    def setUp(self):
+        self.transformer_factory = TransformerFactory()
+
+    def test_invalid_transformers(self):
+        with self.assertRaises(ValueError):
+            self.transformer_factory.get_transformer('INVALID')
+        with self.assertRaises(TypeError):
+            self.transformer_factory.get_transformer()
+
+```
+
+#### **TestStoreTransformer**
+- This part is designed to test the ```STORE``` type transformer. 
+- It verifies the transformation of input CSV data into a predefined format and ensures error handling for invalid CSV input.
+- The tests cover a variety of cases, including valid CSV data, CSV data starting at a non-zero index, and invalid data such as nonexistent files or None values.
+
+```py
+class TestStoreTransformer(unittest.TestCase):
+    def setUp(self):
+        self.transformer = TransformerFactory().get_transformer('STORE')
+
+    def test_add_transformations_with_valid_data(self):
+        data = StringIO("STORE,QTY,VAL,BARCODE,DATE\n1,2,3,1234,20230303")
+        transformed_data = self.transformer.add_transformations(data, start=0, last=True)
+        expected_output = 'Units,Sold at Price,UPC Number,Transaction Line,Transaction Date,Location Code,Is Price Override,Is Markup\n2,3,1234,1,2023-03-03 00:00:00,00001,0,0\n'
+        self.assertEqual(transformed_data, expected_output)
+    # ... remaining tests mentioned in the file
+
+```
+
+
+#### **TestProductTransformer**
+
+- This section tests the ```PRODUCT``` type transformer, checking if it can successfully transform XML data by adding additional tags (such as datetime, color, and order-fulfill). 
+- It also tests for error handling in cases where the XML data is invalid or None.
+
+```py
+class TestProductTransformer(unittest.TestCase):
+    def setUp(self):
+        self.transformer = TransformerFactory().get_transformer('PRODUCT')
+
+    def test_add_transformations_with_valid_xml(self):
+        xml_data = "<products><product><upc>123</upc><step-quantity>1</step-quantity></product></products>"
+        root = ET.fromstring(xml_data)
+        transformed_data = self.transformer.add_transformations(root, start=0, last=True)
+        root = ET.fromstring(transformed_data)
+        self.assertIsNotNone(root.find('.//datetime'))
+        self.assertIsNotNone(root.find('.//color'))
+        self.assertIsNotNone(root.find('.//order-fulfill'))
+    # ... remaining tests mentioned in the file
+
+```
+
+#### **TestAMGtoSFCCLocationTransformer**
+
+- This part tests the ```AMG_TO_SFCC_LOCATION``` type transformer. 
+- It verifies the transformation of store IDs into a predefined format and checks if CSV data is transformed into the correct XML format. 
+- Error handling for invalid data, including non-numeric store IDs and invalid CSV data, is also tested here.
+
+```py
+class TestAMGtoSFCCLocationTransformer(unittest.TestCase):
+    def setUp(self):
+        self.transformer = TransformerFactory().get_transformer('AMG_TO_SFCC_LOCATION')
+
+    def test_transform_store_id_with_valid_data(self):
+        self.assertEqual(self.transformer.transform_store_id('00001'), 'DC01')
+        self.assertEqual(self.transformer.transform_store_id('00010'), 'DC10')
+        self.assertEqual(self.transformer.transform_store_id('00960'), '960')
+        self.assertEqual(self.transformer.transform_store_id(960), '960')
+        self.assertEqual(self.transformer.transform_store_id(1), 'DC01')
+        self.assertEqual(self.transformer.transform_store_id(10), 'DC10')
+    # ... remaining tests mentioned in the file
+
+```
+
+
+
+
+### Usage
+
 - To perform unit tests for all transformers
 
 ```py
@@ -100,5 +198,3 @@ python3 test/test_transformers.py --feed_type=AMG_TO_SFCC_LOCATION --split_point
 python3 test/test_all_transformers.py
 ```
 
-## Error Handling
-- Errors like invalid input data or issues during transformation are handled by printing an error message and raising the exception.

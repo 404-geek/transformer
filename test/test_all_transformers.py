@@ -13,13 +13,13 @@ from transformers.transformer_factory import TransformerFactory
 class TestTransformerFactory(unittest.TestCase):
 
     def setUp(self):
-        self.tranformer_factory = TransformerFactory()
+        self.transformer_factory = TransformerFactory()
     
     def test_invalid_transformers(self):
         with self.assertRaises(ValueError):
-            self.tranformer_factory.get_transformer('INVALID')
+            self.transformer_factory.get_transformer('INVALID')
         with self.assertRaises(TypeError):
-            self.tranformer_factory.get_transformer()
+            self.transformer_factory.get_transformer()
 
 
 class TestStoreTransformer(unittest.TestCase):
