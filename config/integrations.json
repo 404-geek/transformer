@@ -1,0 +1,14 @@
+{
+    "STORE": {
+        "tool-1": true,
+        "tool-2": false,
+        "tool-3":false
+    },
+    "PRODUCT": {
+        "tool-1": true
+    },
+    "AMG_TO_SFCC_LOCATION": {
+        "tool-1": false,
+        "tool-2": true
+    }
+}
