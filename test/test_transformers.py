@@ -33,42 +33,25 @@ def get_and_save_output(transformer, source: str, start: int or None, end: int o
 
 def test_transformers(feed_type: str, split_points: List[int] or None, start: int or None, end: int or None, last: bool, source_file_type: str, destination_file_type: str, **kwargs) -> None:
 
+    source_file_path = kwargs.get("source_file_path")
+    destination_file_path = kwargs.get("destination_file_path")
+
     transformer = TransformerFactory.get_transformer(feed_type)
 
-    directory = 'test'
-    files = []
     try:
-        for file in os.listdir(f'{directory}/input'):
-            if os.path.isfile(os.path.join(f'{directory}/input', file)):
-                files.append(file)
-    except:
-        return print("Error: No input folder provided inside test folder")
+        directory, file_with_extension = os.path.split(source_file_path)
+        file_name, file_format = os.path.splitext(file_with_extension)
 
-    if len(files) == 0:
-        return print("Error: Please provide a input file inside input folder")
 
-    if len(files) > 1:
-        return print("Error: Please provide only one file inside input folder")
-
-    if not os.path.exists(f'{directory}/output'):
-        os.mkdir(f'{directory}/output')
-
-    try:
-        split = os.path.splitext(files[0])
-        file_name = split[0]
-
-        if source_file_type != split[1][1:]:
+        if source_file_type != file_format[1:]:
             raise ValueError("Invalid input file type")
 
-        if not destination_file_type:
-            destination_file_type = source_file_type
-        source = f'{directory}/input/{files[0]}'
 
         if not split_points:
-            output_file_name = f'{directory}/output/{file_name}_batch.txt'
+            output_file_name = f'{destination_file_path}/{file_name}_batch.txt'
             get_and_save_output(
                 transformer=transformer, 
-                source=source, 
+                source=source_file_path, 
                 start=start, 
                 end=end, 
                 last=last, 
@@ -87,12 +70,12 @@ def test_transformers(feed_type: str, split_points: List[int] or None, start: in
                     start += 1
                 end = split_points[i+1]
                 last = (i == (split_length - 2))
-                if not os.path.exists(f'{directory}/output/{file_name}'):
-                    os.mkdir(f'{directory}/output/{file_name}')
-                output_file_name = f'{directory}/output/{file_name}/{file_name}_batch_{i+1}.txt'
+                if not os.path.exists(f'{destination_file_path}/{file_name}'):
+                    os.mkdir(f'{destination_file_path}/{file_name}')
+                output_file_name = f'{destination_file_path}/{file_name}/{file_name}_batch_{i+1}.txt'
                 get_and_save_output(
                     transformer=transformer, 
-                    source=source, 
+                    source=source_file_path, 
                     start=start, 
                     end=end, 
                     last=last, 
@@ -113,12 +96,25 @@ def validate_args(args) -> dict:
 
     if not args.get('feed_type'):
         raise ValueError("feed_type is required")
+    
+    if not args.get('source_file_path'):
+        raise ValueError("source_file_path is required")
 
     if not args.get('source_file_type'):
         raise ValueError("source_file_type is required")
-
+    
+    if not args.get('destination_file_path'):
+        raise ValueError("destination_file_path is required")
+    
     if not args.get('destination_file_type'):
         raise ValueError("destination_file_type is required")
+    
+    if not os.path.exists(args.get("source_file_path")):
+        raise ValueError("Invalid source_file_path")
+    
+    if not os.path.exists(args.get("destination_file_path")):
+        raise ValueError("Invalid destination_file_path")
+
     
     if isinstance(args.get('last'), str):
         if args.get('last').lower() == 'false':
@@ -174,12 +170,11 @@ def main():
             else:
                 kwargs[arg[2:]] = True
 
-    # try:
-    #     validated_args = validate_args(kwargs)
-    # except Exception as e:
-    #     logging.error(e)
-    #     sys.exit(1)
-    validated_args = validate_args(kwargs)
+    try:
+        validated_args = validate_args(kwargs)
+    except Exception as e:
+        logging.error(e)
+        sys.exit(1)
 
     test_transformers(**validated_args)
 
