@@ -44,6 +44,11 @@ KAFKA_SERVER=
 TRANSFORMER_CHANNEL=
 AGGREGATOR_CHANNEL=
 DYNAMODB_KEY=
+API_URI=
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
 ```
 
 
@@ -161,3 +166,143 @@ TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 ## Test Transformers
 
 - To test transformers you can [refer this](./test)
+
+<br/>
+
+# API Boilerplate
+
+## Overview
+
+- RequestHandler is available to perform api calls.
+- It takes 4 arguments - `url`, `method`, `headers`, and `data`
+- `method` is of type `HttpMethod` which is a enum for `get`, `post`, `put` and `delete` http methods as shown below.
+
+```py
+
+class HttpMethod(Enum):
+    GET = "get"
+    POST = "post"
+    PUT = "put"
+    DELETE = "delete"
+
+
+def RequestHandler(url: str, method: HttpMethod, headers: object, data: json):
+    try:
+        if method == HttpMethod.GET:
+            response = requests.get(url, headers=headers)
+        elif method == HttpMethod.POST:
+            response = requests.post(url, headers=headers, data=data)
+        elif method == HttpMethod.PUT:
+            response = requests.put(url, headers=headers, data=data)
+        elif method == HttpMethod.DELETE:
+            response = requests.delete(url, headers=headers)
+        else:
+            print(f"Invalid method {method} specified.")
+            return None
+        return response
+    except Exception as e:
+        print("Error: %s" % e)
+
+```
+
+
+## Usage
+
+- Use `RequestHandler` method by passing `url`, `method`, `headers` and `data`.
+- It returns a `response` object.
+- Here is a `test_api.py` implementing `RequestHandler`
+
+```py
+import json
+from config.config import API_URI
+from api.api import RequestHandler, HttpMethod
+
+
+def test_api():
+    url = f"{API_URI}/test"
+    headers = {"Content-Type": "application/json"}
+    data = json.dumps({"mode": "test"})
+    response = RequestHandler(url=url, method=HttpMethod.POST, headers=headers, data=data)
+    if response != None:
+        print(f"Response: {response.text}")
+
+```
+
+<br/>
+
+# Database Boilerplate
+
+## Overview
+
+- Using `psycopg2` driver to perform operations on `PostgreSQL` database.
+- Implementing a `DatabaseConnection` class and `connect` method to connect to the db with specified credentials.
+- `close` method will disconnect the connection with the db.
+- `query` method takes one argument called query and performs the query operations.
+
+```py
+import psycopg2
+from psycopg2 import OperationalError
+from config.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER
+
+
+class DatabaseConnection:
+    def __init__(self):
+        self.conn = None
+        self.cur = None
+
+    def connect(self):
+        try:
+            params = {
+                "host": DB_HOST,
+                "database": DB_NAME,
+                "user": DB_USER,
+                "password": DB_PASSWORD
+            }
+            self.conn = psycopg2.connect(**params)
+            self.cur = self.conn.cursor()
+            print('Connected to the PostgreSQL database...')
+            
+        except (Exception, OperationalError) as error:
+            print(f"Error: {error}")
+            self.conn = None
+            self.cur = None
+
+    def close(self):
+        if self.cur is not None:
+            self.cur.close()
+        if self.conn is not None:
+            self.conn.commit()
+            print('Database connection closed.')
+
+    def query(self, query):
+        if self.conn is None or self.cur is None:
+            self.connect()
+
+        self.cur.execute(query)
+        result = self.cur.fetchone()
+        return result
+
+
+```
+
+## Usage
+
+- Establish the db connection by creating a `DatabaseConnection` object and then calling `connect` method.
+- Here is a `test_query` which performs a query to print the db version using `query` method.
+
+```py
+from database.connection import DatabaseConnection
+
+
+def test_query():
+    db = DatabaseConnection()
+    db.connect()
+    
+    if db.conn is not None:
+        print('PostgreSQL database version:')
+        result = db.query('SELECT version()')
+        print(result)
+
+        db.close()
+
+```

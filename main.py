@@ -2,12 +2,16 @@ from transformers.transformer_factory import TransformerFactory
 from kafka import KafkaConsumer
 from config.config import KAFKA_SERVER, TRANSFORMER_CHANNEL
 from utils.exception_handler.handler import setup_logger, log_error
+from database.connection import DatabaseConnection
 import json
 
 
 
 def main():
     
+    # db = DatabaseConnection()
+    # db.connect()
+
     setup_logger()
 
     consumer = KafkaConsumer(TRANSFORMER_CHANNEL, bootstrap_servers=KAFKA_SERVER)
