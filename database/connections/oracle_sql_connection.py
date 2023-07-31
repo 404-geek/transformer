@@ -1,19 +1,13 @@
-import psycopg2
+import cx_Oracle
 from database.database_connection import DatabaseConnection
 
 
-class PostgreSQLConnection(DatabaseConnection):
+class OracleSQLConnection(DatabaseConnection):
     def connect(self, db_host, db_name, db_user, db_password):
         try:
-            params = {
-                "host": db_host,
-                "database": db_name,
-                "user": db_user,
-                "password": db_password
-            }
-            self.conn = psycopg2.connect(**params)
+            self.conn = cx_Oracle.connect(user=db_user, password=db_password, dsn=db_host+"/"+db_name)
             self.cur = self.conn.cursor()
-            print('Connected to the PostgreSQL database...')
+            print('Connected to the Oracle SQL database...')
         except Exception as error:
             print(f"Error: {error}")
 
@@ -22,7 +16,7 @@ class PostgreSQLConnection(DatabaseConnection):
             self.cur.close()
         if self.conn:
             self.conn.commit()
-            print('PostgreSQL database connection closed.')
+            print('Oracle SQL database connection closed.')
 
     def query(self, query):
         if self.conn and self.cur:

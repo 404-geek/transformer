@@ -1,7 +1,7 @@
 from database.database_connection import DatabaseConnection
-from database.connections.postgresql_connection import PostgreSQLConnection
 from database.connections.mysql_connection import MySQLConnection
-from database.connections.mongodb_connection import MongoDBConnection
+from database.connections.oracle_sql_connection import OracleSQLConnection
+from database.connections.ms_sql_connection import MSSQLConnection
 from typing import Type
 
 
@@ -34,6 +34,6 @@ class DatabaseConnectionFactory:
 
 
 # Registering database connections
-DatabaseConnectionFactory.register_database_connection("PostgreSQL", PostgreSQLConnection)
 DatabaseConnectionFactory.register_database_connection("MySQL", MySQLConnection)
-DatabaseConnectionFactory.register_database_connection("MongoDB", MongoDBConnection)
+DatabaseConnectionFactory.register_database_connection("OracleSQL", OracleSQLConnection)
+DatabaseConnectionFactory.register_database_connection("MSSQL", MSSQLConnection)

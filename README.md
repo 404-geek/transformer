@@ -232,9 +232,9 @@ def test_api():
 
 ```py
 from database.database_connection import DatabaseConnection
-from database.connections.postgresql_connection import PostgreSQLConnection
 from database.connections.mysql_connection import MySQLConnection
-from database.connections.mongodb_connection import MongoDBConnection
+from database.connections.oracle_sql_connection import OracleSQLConnection
+from database.connections.ms_sql_connection import MSSQLConnection
 from typing import Type
 
 
@@ -267,52 +267,11 @@ class DatabaseConnectionFactory:
 
 
 # Registering database connections
-DatabaseConnectionFactory.register_database_connection("PostgreSQL", PostgreSQLConnection)
 DatabaseConnectionFactory.register_database_connection("MySQL", MySQLConnection)
-DatabaseConnectionFactory.register_database_connection("MongoDB", MongoDBConnection)
+DatabaseConnectionFactory.register_database_connection("OracleSQL", OracleSQLConnection)
+DatabaseConnectionFactory.register_database_connection("MSSQL", MSSQLConnection)
 
 ```
-
-## PostgreSQL connection
-
-- Uses `psycopg2` driver to perform operations on `PostgreSQL` database.
-- Extends `DatabaseConnection` class to create the database connection for PostgreSQL.
-
-```py
-import psycopg2
-from database.database_connection import DatabaseConnection
-
-
-class PostgreSQLConnection(DatabaseConnection):
-    def connect(self, db_host, db_name, db_user, db_password):
-        try:
-            params = {
-                "host": db_host,
-                "database": db_name,
-                "user": db_user,
-                "password": db_password
-            }
-            self.conn = psycopg2.connect(**params)
-            self.cur = self.conn.cursor()
-            print('Connected to the PostgreSQL database...')
-        except Exception as error:
-            print(f"Error: {error}")
-
-    def close(self):
-        if self.cur:
-            self.cur.close()
-        if self.conn:
-            self.conn.commit()
-            print('PostgreSQL database connection closed.')
-
-    def query(self, query):
-        if self.conn and self.cur:
-            self.cur.execute(query)
-            result = self.cur.fetchall()
-            return result
-
-```
-
 
 ## MySQL connection
 
@@ -353,38 +312,73 @@ class MySQLConnection(DatabaseConnection):
 
 ```
 
-## MongoDB connection
+## Oracle SQL connection
 
-- Uses `pymongo` driver to perform operations on `MongoDB` database.
-- Extends `DatabaseConnection` class to create the database connection for MongoDB.
+- Uses `cx_Oracle` driver to perform operations on `Oracle SQL` database.
+- Extends `DatabaseConnection` class to create the database connection for Oracle SQL.
 
 ```py
-import pymongo
+import cx_Oracle
 from database.database_connection import DatabaseConnection
 
 
-class MongoDBConnection(DatabaseConnection):
-    def connect(self, db_host, db_name):
+class OracleSQLConnection(DatabaseConnection):
+    def connect(self, db_host, db_name, db_user, db_password):
         try:
-            self.conn = pymongo.MongoClient(db_host)
-            self.cur = self.conn[db_name]
-            print('Connected to the MongoDB database...')
+            self.conn = cx_Oracle.connect(user=db_user, password=db_password, dsn=db_host+"/"+db_name)
+            self.cur = self.conn.cursor()
+            print('Connected to the Oracle SQL database...')
         except Exception as error:
             print(f"Error: {error}")
 
     def close(self):
+        if self.cur:
+            self.cur.close()
         if self.conn:
-            self.conn.close()
-            print('MongoDB database connection closed.')
+            self.conn.commit()
+            print('Oracle SQL database connection closed.')
 
-    def query(self, collection_name, query_filter=None):
-        if query_filter is None:
-            query_filter = {}
+    def query(self, query):
         if self.conn and self.cur:
-            collection = self.cur[collection_name]
-            result = collection.find(query_filter)
-            return list(result)
+            self.cur.execute(query)
+            result = self.cur.fetchall()
+            return result
+
 ```
+
+## MS SQL connection
+
+- Uses `pyodbc` driver to perform operations on `MS SQL` database.
+- Extends `DatabaseConnection` class to create the database connection for MS SQL.
+
+```py
+import pyodbc
+from database.database_connection import DatabaseConnection
+
+
+class MSSQLConnection(DatabaseConnection):
+    def connect(self, db_host, db_name, db_user, db_password):
+        try:
+            self.conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+db_host+';DATABASE='+db_name+';UID='+db_user+';PWD='+ db_password)
+            self.cur = self.conn.cursor()
+            print('Connected to the MS SQL Server database...')
+        except Exception as error:
+            print(f"Error: {error}")
+
+    def close(self):
+        if self.cur:
+            self.cur.close()
+        if self.conn:
+            self.conn.commit()
+            print('MS SQL Server database connection closed.')
+
+    def query(self, query):
+        if self.conn and self.cur:
+            self.cur.execute(query)
+            result = self.cur.fetchall()
+            return result
+```
+
 
 
 ## Usage
