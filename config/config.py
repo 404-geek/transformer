@@ -14,11 +14,6 @@ DYNAMODB_KEY=env.str("DYNAMODB_KEY")
 
 API_URI=env.str("API_URI")
 
-DB_HOST=env.str("DB_HOST")
-DB_NAME=env.str("DB_NAME")
-DB_USER=env.str("DB_USER")
-DB_PASSWORD=env.str("DB_PASSWORD")
-
 
 def get_integrations(feed_type: str):
     integrations_file_path = 'config/integrations.json'

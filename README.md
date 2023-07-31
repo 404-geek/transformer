@@ -174,31 +174,22 @@ TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
 ## Overview
 
 - RequestHandler is available to perform api calls.
-- It takes 4 arguments - `url`, `method`, `headers`, and `data`
-- `method` is of type `HttpMethod` which is a enum for `get`, `post`, `put` and `delete` http methods as shown below.
+- It takes 4 arguments - `url`, `method`, `headers`, `data`, `params`, `json`, and `files`
+- `url` and `method` are required arguments and remaining arguments are optional.
 
 ```py
 
-class HttpMethod(Enum):
-    GET = "get"
-    POST = "post"
-    PUT = "put"
-    DELETE = "delete"
-
-
-def RequestHandler(url: str, method: HttpMethod, headers: object, data: json):
+def RequestHandler(url, method, headers=None, data=None, params=None, json=None, files=None):
     try:
-        if method == HttpMethod.GET:
-            response = requests.get(url, headers=headers)
-        elif method == HttpMethod.POST:
-            response = requests.post(url, headers=headers, data=data)
-        elif method == HttpMethod.PUT:
-            response = requests.put(url, headers=headers, data=data)
-        elif method == HttpMethod.DELETE:
-            response = requests.delete(url, headers=headers)
-        else:
-            print(f"Invalid method {method} specified.")
-            return None
+        response = requests.request(
+            method,
+            url,
+            headers,
+            data,
+            params,
+            json,
+            files
+        )
         return response
     except Exception as e:
         print("Error: %s" % e)
@@ -215,14 +206,14 @@ def RequestHandler(url: str, method: HttpMethod, headers: object, data: json):
 ```py
 import json
 from config.config import API_URI
-from api.api import RequestHandler, HttpMethod
+from api.api import RequestHandler
 
 
 def test_api():
     url = f"{API_URI}/test"
     headers = {"Content-Type": "application/json"}
     data = json.dumps({"mode": "test"})
-    response = RequestHandler(url=url, method=HttpMethod.POST, headers=headers, data=data)
+    response = RequestHandler(url=url, method='post', headers=headers, data=data)
     if response != None:
         print(f"Response: {response.text}")
 
@@ -234,75 +225,198 @@ def test_api():
 
 ## Overview
 
-- Using `psycopg2` driver to perform operations on `PostgreSQL` database.
-- Implementing a `DatabaseConnection` class and `connect` method to connect to the db with specified credentials.
-- `close` method will disconnect the connection with the db.
-- `query` method takes one argument called query and performs the query operations.
+- Using Factory design pattern to fetch the db connection base on `db_type`.
+- `register_database_connection` registers the db connection with a `db_type` key.
+- `get_database_connection` returns a db connection based on `db_type`.
+
+
+```py
+from database.database_connection import DatabaseConnection
+from database.connections.postgresql_connection import PostgreSQLConnection
+from database.connections.mysql_connection import MySQLConnection
+from database.connections.mongodb_connection import MongoDBConnection
+from typing import Type
+
+
+DatabaseConnectionType = Type[DatabaseConnection]
+
+
+class DatabaseConnectionFactory:
+
+    _database_connections = {}
+
+    # register a database connection
+    @staticmethod
+    def register_database_connection(key:str, database_connection: DatabaseConnectionType) -> None:
+        ''' Registering a database connection using db type'''
+
+        DatabaseConnectionFactory._database_connections[key] = database_connection
+
+
+    # get database connection based on feed type
+    @staticmethod
+    def get_database_connection(db_type:str) -> DatabaseConnection :
+        ''' Get required database connection based on db type '''
+
+        database_connection = DatabaseConnectionFactory._database_connections.get(db_type)
+        if database_connection:
+            return database_connection()
+        else:
+            raise ValueError(f"Unsupported feed type: {db_type}")
+        
+
+
+# Registering database connections
+DatabaseConnectionFactory.register_database_connection("PostgreSQL", PostgreSQLConnection)
+DatabaseConnectionFactory.register_database_connection("MySQL", MySQLConnection)
+DatabaseConnectionFactory.register_database_connection("MongoDB", MongoDBConnection)
+
+```
+
+## PostgreSQL connection
+
+- Uses `psycopg2` driver to perform operations on `PostgreSQL` database.
+- Extends `DatabaseConnection` class to create the database connection for PostgreSQL.
 
 ```py
 import psycopg2
-from psycopg2 import OperationalError
-from config.config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USER
+from database.database_connection import DatabaseConnection
 
 
-class DatabaseConnection:
-    def __init__(self):
-        self.conn = None
-        self.cur = None
-
-    def connect(self):
+class PostgreSQLConnection(DatabaseConnection):
+    def connect(self, db_host, db_name, db_user, db_password):
         try:
             params = {
-                "host": DB_HOST,
-                "database": DB_NAME,
-                "user": DB_USER,
-                "password": DB_PASSWORD
+                "host": db_host,
+                "database": db_name,
+                "user": db_user,
+                "password": db_password
             }
             self.conn = psycopg2.connect(**params)
             self.cur = self.conn.cursor()
             print('Connected to the PostgreSQL database...')
-            
-        except (Exception, OperationalError) as error:
+        except Exception as error:
             print(f"Error: {error}")
-            self.conn = None
-            self.cur = None
 
     def close(self):
-        if self.cur is not None:
+        if self.cur:
             self.cur.close()
-        if self.conn is not None:
+        if self.conn:
             self.conn.commit()
-            print('Database connection closed.')
+            print('PostgreSQL database connection closed.')
 
     def query(self, query):
-        if self.conn is None or self.cur is None:
-            self.connect()
-
-        self.cur.execute(query)
-        result = self.cur.fetchone()
-        return result
-
+        if self.conn and self.cur:
+            self.cur.execute(query)
+            result = self.cur.fetchall()
+            return result
 
 ```
 
-## Usage
 
-- Establish the db connection by creating a `DatabaseConnection` object and then calling `connect` method.
-- Here is a `test_query` which performs a query to print the db version using `query` method.
+## MySQL connection
+
+- Uses `mysql.connector` driver to perform operations on `MySQL` database.
+- Extends `DatabaseConnection` class to create the database connection for MySQL.
 
 ```py
-from database.connection import DatabaseConnection
+import mysql.connector
+from database.database_connection import DatabaseConnection
 
 
-def test_query():
-    db = DatabaseConnection()
-    db.connect()
-    
-    if db.conn is not None:
-        print('PostgreSQL database version:')
-        result = db.query('SELECT version()')
-        print(result)
+class MySQLConnection(DatabaseConnection):
+    def connect(self, db_host, db_name, db_user, db_password):
+        try:
+            self.conn = mysql.connector.connect(
+                host=db_host,
+                user=db_user,
+                passwd=db_password,
+                database=db_name
+            )
+            self.cur = self.conn.cursor()
+            print('Connected to the MySQL database...')
+        except Exception as error:
+            print(f"Error: {error}")
 
-        db.close()
+    def close(self):
+        if self.cur:
+            self.cur.close()
+        if self.conn:
+            self.conn.commit()
+            print('MySQL database connection closed.')
+
+    def query(self, query):
+        if self.conn and self.cur:
+            self.cur.execute(query)
+            result = self.cur.fetchall()
+            return result
+
+```
+
+## MongoDB connection
+
+- Uses `pymongo` driver to perform operations on `MongoDB` database.
+- Extends `DatabaseConnection` class to create the database connection for MongoDB.
+
+```py
+import pymongo
+from database.database_connection import DatabaseConnection
+
+
+class MongoDBConnection(DatabaseConnection):
+    def connect(self, db_host, db_name):
+        try:
+            self.conn = pymongo.MongoClient(db_host)
+            self.cur = self.conn[db_name]
+            print('Connected to the MongoDB database...')
+        except Exception as error:
+            print(f"Error: {error}")
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
+            print('MongoDB database connection closed.')
+
+    def query(self, collection_name, query_filter=None):
+        if query_filter is None:
+            query_filter = {}
+        if self.conn and self.cur:
+            collection = self.cur[collection_name]
+            result = collection.find(query_filter)
+            return list(result)
+```
+
+
+## Usage
+
+- Establish the db connection by creating a `DatabaseConnectionFactory` object and then calling `get_database_connection` method py passing `db_type`.
+- Here is a `test_query.py` file which performs a query on all these database connections.
+
+```py
+from database.database_connection_factory import DatabaseConnectionFactory
+
+
+def test_postgresql_query():
+    db = DatabaseConnectionFactory.get_database_connection("PostgreSQL")
+    db.connect("localhost", "testdb", "postgres", "postgres")
+    result = db.query("SELECT * FROM users")
+    print(result)
+    db.close()
+
+
+def test_mysql_query():
+    db = DatabaseConnectionFactory.get_database_connection("MySQL")
+    db.connect('localhost', 'mydatabase', 'myuser', 'mypassword')
+    result = db.query("SELECT * FROM test_table")
+    print(result)
+    db.close()
+
+
+def test_mongodb_query():
+    db = DatabaseConnectionFactory.get_database_connection("MongoDB")
+    db.connect('localhost', 'mydatabase')
+    result = db.query('mycollection', {"field": "value"}) 
+    print(result)
+    db.close()
 
 ```
