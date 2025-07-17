@@ -1,6 +1,7 @@
 from transformers.product_transformer import ProductTransformer
 from transformers.store_transformer import StoreTransformer
 from transformers.amg_to_sfcc_location_transformer import AMGtoSFCCLocationTransformer
+from transformers.amg_to_sfcc_list_and_sale_price_transformer import ListAndSalePriceTransformer
 from transformers.sample_transformer import SampleTransformer
 from utils.transformer.base_transformer import BaseTransformer
 from typing import Type
@@ -37,4 +38,5 @@ class TransformerFactory:
 TransformerFactory.register_transformer("PRODUCT", ProductTransformer)
 TransformerFactory.register_transformer("STORE", StoreTransformer)
 TransformerFactory.register_transformer("AMG_TO_SFCC_LOCATION", AMGtoSFCCLocationTransformer)
-TransformerFactory.register_transformer("SAMPLE", SampleTransformer)
+TransformerFactory.register_transformer("p8_uk_gb_gbp_sale_price", ListAndSalePriceTransformer)
+# TransformerFactory.register_transformer("SAMPLE", SampleTransformer)

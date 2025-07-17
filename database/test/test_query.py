@@ -3,7 +3,7 @@ from database.database_connection_factory import DatabaseConnectionFactory
 
 def test_mysql_query():
     db = DatabaseConnectionFactory.get_database_connection("MySQL")
-    db.connect('localhost', 'mysql', 'stride', '123456')
+    db.connect('localhost', 'mysql', 'g10x', '123456')
     result = db.query("SELECT * FROM db")
     print(result)
     db.close()
